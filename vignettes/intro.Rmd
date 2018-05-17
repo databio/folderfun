@@ -1,0 +1,158 @@
+---
+title: "Getting started with folderfun"
+author: "Nathan Sheffield"
+date: "`r Sys.Date()`"
+output: 
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{1. Getting started with folderfun}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE}
+# These settings make the vignette prettier
+knitr::opts_chunk$set(results="hold", collapse=FALSE, message=FALSE)
+#refreshPackage("GenomicDistributions")
+#devtools::build_vignettes("code/GenomicDistributions")
+#devtools::test("code/GenomicDistributions")
+```
+
+## Overview
+
+The `folderfun` (short for *folder functions*) package makes it easy for you to manage disk resources for your R project.
+
+In a basic R project, you'll probably want to read in data and write out plots or result tables. By default, the reading, plotting, and writing functions will read or write files in your current working directory. Fine for small, simple projects, but big projects can require multiple folders for each input and output. These folders can be organized in different ways and reside on different file systems. It can become a nightmare to keep track of the locations of all the folders on disk where different data and results are stored. And if you start hard-coding paths, you make your code less portable, because it will only be able to be run in that computing environment. What if data changes locations? Your code breaks.
+
+`folderfun` solves all these issues by making it dead simple to use what I call *wrapper folder functions* to point to different data sources. Instead of pointing to input or output files with absolute filenames, we define a function that is aware of the parent folder, and then use relative filenames wrapped in the appropriate function. These project-level functions thus point to project-level folders so you don't have to hard-code paths more than once.
+
+`folderfun` also lets you take things a step further by using environment variables to define folder root locations. Using this system, you can define environment-wide folders, and then set up project-level subfolders with individual functions with almost no effort. This allows you to make your code more portable and sharable. It also enables multiple users to work together on complex projects in different compute environments while sharing a single code base.
+
+## Motivation and basic use case
+
+Let's say we have a project that needs to read data from one folder, let's call it `data`, and write results to another folder, let's call it `results`. Here's how you might start this analysis naively:
+
+```{r, eval=FALSE}
+input1 = read.table("/long/and/annoying/path/to/hard/coded/file/data.txt")
+input2 = read.table("/long/and/annoying/path/to/hard/coded/file/data2.txt")
+output1 = processData(input)
+output2 = processData2(input2)
+
+# Run other analysis...
+
+write.table("/different/long/annoying/hard/coded/path/result.txt", output1)
+write.table("/different/long/annoying/hard/coded/path/result2.txt", output2)
+```
+
+Ok, that works... but this has got multiple problems: First, you repeat the paths,  making it harder to change, Second, if the data move, you have to update multiple things. Third, this script won't work in a different compute environment.
+
+A better alternative would be to define our variable beforehand, and then use it in multiple places:
+
+```{r, eval=FALSE}
+inputDir = "/long/and/annoying/path/to/hard/coded/file/"
+outputDir = "/different/long/annoying/hard/coded/path/"
+
+input1 = read.table(paste0(dataDir, "data.txt"))
+input2 = read.table(paste0(dataDir, "data2.txt"))
+output1 = processData(input)
+output2 = processData2(input2)
+
+# Run other analysis...
+
+write.table(paste0(outputDir, "result.txt"))
+write.table(paste0(outputDir, "result2.txt"))
+```
+
+That's much nicer; it limits the hard-coded folders to a single variable per folder, making them easier to maintain. Plus, now someone else could re-use this script by just adjusting the variable pointers at the top. BUt that `paste0(dataDir, ...)` syntax is really annoying...`folderfun` makes this nicer.
+
+
+## Getting started with the `folderfun` approach
+
+With `folderfun`, we'll use a function called `setff` to create a new folder function that knows about each of our folders of interest. We assign each folder function a name (`In` and `Out` in this example), and provide the location to the folder:
+
+
+```{r}
+library(folderfun)
+setff("In", "/long/and/annoying/path/to/hard/coded/file/")
+setff("Out", "/different/long/annoying/hard/coded/path/")
+
+```
+
+These functions will create new, customized functions named according to our given name, prepended with the text *ff*. We can then get absolute paths to any files in those folders by passing a relative path to our newly created folder functions, like this:
+
+```{r}
+
+ffIn("data.txt")
+ffOut("result.txt")
+```
+
+So our original analysis would look something like this:
+
+```{r, eval=FALSE}
+
+input1 = read.table(ffIn("data.txt"))
+input2 = read.table(ffIn("data2.txt"))
+output1 = processData(input)
+output2 = processData2(input2)
+
+# Run other analysis...
+
+write.table(ffOut("result.txt"))
+write.table(ffOut("result2.txt"))
+```
+
+So, to reiterate: when you create a folder function named "In", you now have access to a function called `ffIn()` that will access files in that directory. You can have as many folder functions you want with whatever names you like.
+
+## Using environment variables
+
+`folderfun` also provides a more generic function that can retrieve a file from *any* set folder function: `inff()`. This function looks for the file in the given folder, and you could do the same as above like thsi:
+
+```{r}
+inff("In", "data.txt")
+inff("Out", "result.txt")
+```
+
+But using it like that isn't really useful, of course, because you can just use the functions themselves (`ffIn` and `ffOut`) as above. Where `inff` becomes useful is if you want to use environment variables to eliminate the step of hard-coding *anything* in your R session. For example, say we put this code into our `.bashrc` or `.profile` to define the locations for this compute environment:
+
+```{bash, eval=FALSE}
+export INDIR="/long/and/annoying/path/to/hard/coded/file/"
+export OUTDIR="/different/long/annoying/hard/coded/path/"
+```
+
+The `inff` function actually looks in two places: first, it checks to see if a folder function has been set (with `setff`) with the given name. If not, it checks to see if an environment variable exists with that name, and uses that instead. So let's set an environment variable and then use `inff` to access it:
+
+```{r}
+Sys.setenv(INDIR="/long/and/annoying/path/to/hard/coded/file/")
+Sys.setenv(OUTDIR="/different/long/annoying/hard/coded/path/")
+inff("INDIR", "data.txt")
+```
+
+This is useful because it lets you create create project-level input and output folders that are subfolders of generic folders, and you can outsource the specification of the root directories to your `.profile`.
+
+# Project-level 
+
+So, assume we've set `INDIR` and `OUTDIR` as bash variables. Now all we need to do to establish project-specific subdirectories is this:
+
+```{r}
+projName="myproject"
+
+setff("In", inff("INDIR", projName))
+setff("Out", inff("OUTDIR", projName))
+
+ffIn()
+ffIn("data.txt")
+
+```
+
+By moving specification of the folder root structure into an environment variable, we've made the whole project ultra-portable. This script will run on any compute environment -- you just have to set the parent environment variables correctly.  No absolute paths will ever need to be changed within the script if data moves.
+
+## Management
+
+You can get a list of all your loaded folder functions with the `listff` function:
+
+```{r, eval=FALSE}
+
+listff()
+
+```
