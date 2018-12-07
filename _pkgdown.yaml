@@ -11,10 +11,13 @@ navbar:
   - text: Documentation
     icon: fa-pencil
     href: reference/index.html
+  - text: Changelog
+    icon: fa-file-text
+    href: news/index.html
+  right:
   - text: GitHub
     icon: fa-github fa-lg
     href: https://github.com/databio/folderfun
-  right:
   - text: Databio.org
     href: http://databio.org
   - text: Software & Data

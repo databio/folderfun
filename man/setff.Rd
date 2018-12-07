@@ -2,7 +2,7 @@
 % Please edit documentation in R/folderfun.R
 \name{setff}
 \alias{setff}
-\title{Creates a folder function for easy access to the directory}
+\title{Create a folder function}
 \usage{
 setff(name, location)
 }
@@ -10,12 +10,20 @@ setff(name, location)
 \item{name}{An immutable key given to identify the current folder, and used as a
 string to create the new folder function}
 
-\item{location}{(Absolute) path to a folder that will be prepend when the
+\item{location}{An absolute path to a folder that will be prepend when the
 specified folder function is called}
+}
+\value{
+A function named \code{ff<name>} that when executed without 
+arguments points to the \code{location} and appends the provided argument to it.
 }
 \description{
 Creates a folder function for easy access to the directory
 }
 \examples{
-setff("PROC", "here")
+setff("PROC", "/path/to/directory")
+}
+\seealso{
+See \href{http://code.databio.org/folderfun/articles/intro.html}{this vignette} for more
+ detailed explanation of the concept
 }

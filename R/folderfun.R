@@ -20,61 +20,44 @@ NULL
 .PDIROPTTAG = "FF_"
 .PDIRFUNCTAG = "ff"
 
+#' Create a folder function
+#' 
 #' Creates a folder function for easy access to the directory
 #' @param name An immutable key given to identify the current folder, and used as a
 #'     string to create the new folder function
-#' @param location     (Absolute) path to a folder that will be prepend when the
+#' @param location An absolute path to a folder that will be prepend when the
 #'     specified folder function is called
+#' @return A function named \code{ff<name>} that when executed without 
+#' arguments points to the \code{location} and appends the provided argument to it
+#' if any were provided.
 #' @export
+#' @seealso See \href{http://code.databio.org/folderfun/articles/intro.html}{this vignette} for more
+#'  detailed explanation of the concept
 #' @examples
-#' setff("PROC", "here")
+#' setff("PROC", "/path/to/directory")
 setff = function(name, location) {
 	l = list(location)
 	varName = paste0(.PDIROPTTAG, name)
 	names(l) = varName
 	# Set the option
 	options(l)
-	message(name, ": ", getOption(varName))
 	funcName = paste0(.PDIRFUNCTAG, name)
-
 	tempFunc = function(...) {
-		inff(name, ...)		
+	  userPath = .sanitizeUserPath(...)
+	  # First check if there's an R option with this name.
+	  parentFolder = getOption(varName)
+	  if (is.null(parentFolder)) {
+	    stop("No parent folder found for variable ", name)
+	  }
+	  outputPath = file.path(parentFolder, userPath)
+	  # prevent returing paths with double slashes
+	  outputPath = gsub("//","/",outputPath)
+	  return(outputPath)	
 	}
 	assign(funcName, tempFunc, envir=globalenv())
-}
-
-#' Prepends a parent folder to a given filename or directory.
-#' 
-#' Generic function to prepend an environment variable directory to your
-#' relative filepath. This helps make your scripts portable because you can
-#' point to all files with a relative path. This function uses a variable to
-#' identify pre-specified root folders, and then it makes your relative path
-#' into an absolute path by pre- pending the appropriate root folder. The
-#' variables identify locations of root folders using a priority system; it look
-#' first in R options, and then in environment variables.
-#' @param ffName The name of a variable (either an R option or an environment
-#'     variable) that contains the path to the root folder to prepend
-#' @param ... One or more arguments that, when concatenated, specify a relative
-#'     path to a file or folder within the parent folder represented by the
-#'     folder function.
-#' @export
-#' @examples
-#' inff("PROC", "data.txt")
-inff = function(ffName, ...) {
-	userPath = .sanitizeUserPath(...)
-	varName = paste0(.PDIROPTTAG, ffName)
-	# First check if there's an R option with this name.
-	parentFolder = getOption(varName)
-	# If not, try an environment variable
-	if (is.null(parentFolder)) {
-		parentFolder = Sys.getenv(ffName)
-	}
-	# Otherwise, bail out, what can we do?
-	if (is.null(parentFolder)) {
-		stop("No parent folder found for variable ", ffName)
-	}
-	outputPath = file.path(parentFolder, userPath)
-	return(outputPath)
+	message(
+	  "Created folder function ", funcName, "(): ", tempFunc()
+	)
 }
 
 
