@@ -1,6 +1,6 @@
 # PACKAGE DOCUMENTATION
 #' Manages folder functions
-#' 
+#'
 #' If you find yourself working on multiple different projects in R, you'll want
 #' a series of folders pointing to raw data, processed data, plot results,
 #' intermediate table outputs, etc. This package makes it easier to do that by
@@ -21,7 +21,7 @@ NULL
 .PDIRFUNCTAG = "ff"
 
 #' Create a folder function
-#' 
+#'
 #' Creates a folder function for easy access to the directory
 #' @param name An immutable key given to identify the current folder, and used as a
 #'     string to create the new folder function
@@ -31,8 +31,8 @@ NULL
 #'    be bound to \code{name}. First \code{getOption} is used, and then 
 #'    \code{Sys.getenv}.
 #' @return A function named \code{ff<name>} that when executed without 
-#' arguments points to the \code{path} and appends the provided argument to it
-#' if any were provided.
+#'    arguments points to the \code{path} and appends the provided argument to it
+#'    if any were provided.
 #' @export
 #' @seealso See \href{http://code.databio.org/folderfun/articles/intro.html}{this vignette} for more
 #'  detailed explanation of the concept
@@ -64,9 +64,7 @@ setff = function(name, path = NULL, currVar = NULL) {
 	  return(outputPath)	
 	}
 	assign(funcName, tempFunc, envir=globalenv())
-	message(
-	  "Created folder function ", funcName, "(): ", tempFunc()
-	)
+	message("Created folder function ", funcName, "(): ", tempFunc())
 }
 
 
@@ -75,12 +73,12 @@ setff = function(name, path = NULL, currVar = NULL) {
 #' Displays the environment variables that are set and used by this package.
 #'@export
 listff = function() {
-	optionNames = names(options())
-	pdirOpts = grep(.PDIROPTTAG, optionNames)
-	pdirOptNames = optionNames[pdirOpts]
-	pdirOptVals = options()[pdirOpts]
-	funcNames = paste0(.PDIRFUNCTAG, sub(.PDIROPTTAG, "", pdirOptNames))
-	cbind(pdirOptVals, funcNames)
+  optionNames = names(options())
+  pdirOpts = grep(.PDIROPTTAG, optionNames)
+  pdirOptNames = optionNames[pdirOpts]
+  pdirOptVals = options()[pdirOpts]
+  funcNames = paste0(.PDIRFUNCTAG, sub(.PDIROPTTAG, "", pdirOptNames))
+  cbind(pdirOptVals, funcNames)
 }
 
 
@@ -111,14 +109,13 @@ optOrVar = function(name) {
 
 # paste0() if given no values returns character(0); this doesn't play
 # nicely with file.path, which returns bad value if any of the values are
-# bad, instead of ignoring them. This function changes the default output to an 
+# bad, instead of ignoring them. This function changes the default output to an
 # empty string so it can be passed to file.path without problems.
 .sanitizeUserPath = function(...) {
-	userPath = paste0(...)
-	if (identical(userPath, character(0))) {
-		# for a blank function call; that's allowed, give parent dir.
-		userPath = ""
-	}
-	return(userPath)
+  userPath = paste0(...)
+  if (identical(userPath, character(0))) {
+    # for a blank function call; that's allowed, give parent dir.
+    userPath = ""
+  }
+  return(userPath)
 }
-

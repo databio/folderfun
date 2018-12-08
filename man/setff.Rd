@@ -19,8 +19,8 @@ be bound to \code{name}. First \code{getOption} is used, and then
 }
 \value{
 A function named \code{ff<name>} that when executed without 
-arguments points to the \code{path} and appends the provided argument to it
-if any were provided.
+   arguments points to the \code{path} and appends the provided argument to it
+   if any were provided.
 }
 \description{
 Creates a folder function for easy access to the directory
