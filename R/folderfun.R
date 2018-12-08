@@ -58,7 +58,7 @@ setff = function(name, path = NULL, currVar = NULL) {
 	  if (is.null(parentFolder)) {
 	    stop("No parent folder found for variable ", name)
 	  }
-	  outputPath = file.path(parentFolder, userPath)
+	  outputPath = if (.isEmpty(userPath)) parentFolder else file.path(parentFolder, userPath)
 	  # prevent returing paths with double slashes
 	  outputPath = gsub("//","/",outputPath)
 	  return(outputPath)	
