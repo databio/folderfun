@@ -4,18 +4,23 @@
 \alias{setff}
 \title{Create a folder function}
 \usage{
-setff(name, location)
+setff(name, path = NULL, currVar = NULL)
 }
 \arguments{
 \item{name}{An immutable key given to identify the current folder, and used as a
 string to create the new folder function}
 
-\item{location}{An absolute path to a folder that will be prepend when the
+\item{path}{An absolute path to a folder that will be prepend when the
 specified folder function is called}
+
+\item{currVar}{Name of the currently set variable whose value should 
+be bound to \code{name}. First \code{getOption} is used, and then 
+\code{Sys.getenv}.}
 }
 \value{
 A function named \code{ff<name>} that when executed without 
-arguments points to the \code{location} and appends the provided argument to it.
+arguments points to the \code{path} and appends the provided argument to it
+if any were provided.
 }
 \description{
 Creates a folder function for easy access to the directory

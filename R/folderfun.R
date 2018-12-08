@@ -25,18 +25,27 @@ NULL
 #' Creates a folder function for easy access to the directory
 #' @param name An immutable key given to identify the current folder, and used as a
 #'     string to create the new folder function
-#' @param location An absolute path to a folder that will be prepend when the
+#' @param path An absolute path to a folder that will be prepend when the
 #'     specified folder function is called
+#' @param currVar Name of the currently set variable whose value should 
+#'    be bound to \code{name}. First \code{getOption} is used, and then 
+#'    \code{Sys.getenv}.
 #' @return A function named \code{ff<name>} that when executed without 
-#' arguments points to the \code{location} and appends the provided argument to it
+#' arguments points to the \code{path} and appends the provided argument to it
 #' if any were provided.
 #' @export
 #' @seealso See \href{http://code.databio.org/folderfun/articles/intro.html}{this vignette} for more
 #'  detailed explanation of the concept
 #' @examples
 #' setff("PROC", "/path/to/directory")
-setff = function(name, location) {
-	l = list(location)
+setff = function(name, path = NULL, currVar = NULL) {
+	if (.isEmpty(path)) {
+		if (.isEmpty(currVar)) stop("To set a variable, path or currVar must be provided.")
+		path = optOrVar(currVar)
+		if (.isEmpty(path)) stop(sprintf(
+			"No value provided, and variable %s is empty", currVar))
+	} else if (!.isEmpty(currVar)) { warning("Explicit value provided; ignoring ", currVar) }
+	l = list(path)
 	varName = paste0(.PDIROPTTAG, name)
 	names(l) = varName
 	# Set the option
@@ -73,6 +82,31 @@ listff = function() {
 	funcNames = paste0(.PDIRFUNCTAG, sub(.PDIROPTTAG, "", pdirOptNames))
 	cbind(pdirOptVals, funcNames)
 }
+
+
+#' Retrieval of value associated with a name
+#'
+#' \code{optOrVar} retrieves that value assocaited with the 
+#' name provided as an argument, prioritizing in its search 
+#' by first interpreting the given argument as an \code{R}
+#' option name, and then trying an interpretation as an 
+#' environment variable if and only if the \code{R} option 
+#' is not set or is an empty string or vector.
+#'
+#' @param name
+#' @return The value associated with the given \code {name}, 
+#'    returning \code{NULL} if and only if the \code{name} is 
+#'    set neither as an option nor as environment variable.
+#' @export
+optOrVar = function(name) {
+	opt = getOption(name)
+	res = if (.nonempty(name)) opt else Sys.getenv(name)
+	if (.nonempty(res)) res else NULL
+}
+
+
+.isEmpty = function(x) is.null(x) || identical(x, "") || length(x) == 0
+.nonempty = function(x) !.isEmpty(var)
 
 
 # paste0() if given no values returns character(0); this doesn't play
