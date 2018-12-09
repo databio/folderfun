@@ -45,6 +45,7 @@ setff = function(name, path = NULL, currVar = NULL) {
 		if (.isEmpty(path)) stop(sprintf(
 			"No value provided, and variable %s is empty", currVar))
 	} else if (!.isEmpty(currVar)) { warning("Explicit value provided; ignoring ", currVar) }
+	if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
 	l = list(path)
 	varName = paste0(.PDIROPTTAG, name)
 	names(l) = varName

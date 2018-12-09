@@ -17,6 +17,9 @@ test_that("result of function created matches value provided",  {
 	}
 })
 
-#test_that("setting empty value is prohibited", {
-#
-#})
+test_that("setting empty value is prohibited", {
+	for (val in c(NULL, "", character(0), logical(0), numeric(0), integer(0))) {
+		optName = paste0(sample(letters, sample(10:20)), collapse = "")
+		expect_error(setff(!!optName, val))
+	}
+})
