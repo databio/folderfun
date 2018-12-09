@@ -19,5 +19,5 @@ cleanFfSetting = function(n) {
   optArg = list(NULL)
   names(optArg) = paste0(.PDIROPTTAG, n)
   options(optArg)
-  do.call(what = rm, args = list(paste0(.PDIRFUNCTAG, n), pos= globalenv()))
+  do.call(what = rm, args = list(paste0(.PDIRFUNCTAG, n), pos = globalenv()))
 }
