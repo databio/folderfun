@@ -1,4 +1,4 @@
-# helper-setff.R
+# helper-all.R
 # Ancillary functions for setff tests
 # Author: Vince Reuter
 # Email: vpr9v@virginia.edu

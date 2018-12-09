@@ -20,6 +20,7 @@ NULL
 .PDIROPTTAG = "FF_"
 .PDIRFUNCTAG = "ff"
 
+
 #' Create a folder function
 #'
 #' Creates a folder function for easy access to the directory
@@ -99,13 +100,13 @@ listff = function() {
 #' @export
 optOrVar = function(name) {
 	opt = getOption(name)
-	res = if (.nonempty(name)) opt else Sys.getenv(name)
+	res = if (.nonempty(opt)) opt else Sys.getenv(name)
 	if (.nonempty(res)) res else NULL
 }
 
 
 .isEmpty = function(x) is.null(x) || identical(x, "") || length(x) == 0
-.nonempty = function(x) !.isEmpty(var)
+.nonempty = function(x) !.isEmpty(x)
 
 
 # paste0() if given no values returns character(0); this doesn't play
