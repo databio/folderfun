@@ -14,6 +14,7 @@ test_that("result of function created matches value provided",  {
 		expect_true(.isEmpty(optOrVar(!!ns[i])))
 		setff(ns[i], path = xs[i])
 		expect_equal(eval(get(paste0(.PDIRFUNCTAG, !!ns[i]))()), !!xs[i])
+		cleanFfSetting(ns[i])
 	}
 })
 
@@ -46,5 +47,6 @@ test_that("explicit value trumps variable, and using both emits warning", {
 		expect_warning(setff(target, path = fixed, currVar = varnames[i]))
 		func = paste0(.PDIRFUNCTAG, "DUMMY_TEST_VAR")
 		expect_equal(eval(get(func)()), fixed)
+		cleanFfSetting(target)
 	}
 })
