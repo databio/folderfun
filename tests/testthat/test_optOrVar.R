@@ -29,8 +29,10 @@ test_that("Option is recovered", {
 })
 
 test_that("Environment variable is recovered", {
+  checkClean = function(n) { 
+    stopifnot(is.null(getOption(n)) && identical("", Sys.getenv(n))) } 
   for (n in sapply(1:10, getRandVarName)) {
-    stopifnot(is.null(getOption(n)) && identical("", Sys.getenv(n)))
+    checkClean(n)
     value = "dummy_test_value"
     args = list(value)
     names(args) = n
@@ -38,6 +40,7 @@ test_that("Environment variable is recovered", {
     if (.isEmpty(Sys.getenv(n))) stop("Failed to set env var: ", n)
     expect_equal(optOrVar(!!n), value)
     Sys.unsetenv(n)
+    checkClean(n)
   }
 })
 
@@ -45,9 +48,11 @@ test_that("Option trumps environment variable", {
   varnames = sapply(1:10, getRandVarName)
   optValues = sapply(1:10, getRandVarName)
   envVarValues = sapply(1:10, getRandVarName)
+  checkClean = function(n) {
+    stopifnot(is.null(getOption(n)) && identical("", Sys.getenv(n))) }
   for (i in 1:10) {
     n = varnames[i]
-    stopifnot(is.null(getOption(n)) && identical("", Sys.getenv(n)))
+    checkClean(n)
     optVal = list(optValues[i])
     names(optVal) = n
     options(optVal)
@@ -60,29 +65,52 @@ test_that("Option trumps environment variable", {
     optVal = list(NULL)
     names(optVal) = n
     options(optVal)
-    stopifnot(is.null(getOption(n)) && identical("", Sys.getenv(n)))
+    checkClean(n)
   }
 })
 
 test_that("NULL result when option is empty", {
-  varname = "dummy_test_opt"
+  optname = "dummy_test_opt"
+  checkClean = function() stopifnot(is.null(getOption(optname)))
   for (x in list("", logical(0), character(0), numeric(0), integer(0))) {
-    stopifnot(is.null(getOption(varname)))
+    checkClean()
     optArg = list(x)
-    names(optArg) = varname
+    names(optArg) = optname
     options(optArg)
-    if (is.null(getOption(varname))) stop("Failed to set option: ", varname)
-    message("CLASS: ", class(optOrVar(varname)))
-    expect_true(is.null(optOrVar(varname)))
+    if (is.null(getOption(optname))) stop("Failed to set option: ", optname)
+    expect_true(is.null(optOrVar(optname)))
     optArg = list(NULL)
-    names(optArg) = varname
+    names(optArg) = optname
     options(optArg)
-    stopifnot(is.null(getOption(varname)))
+    checkClean()
+  }
+})
+
+test_that("Empty opt doesn't block nonempty var", {
+  name = "testing123"
+  checkClean = function() {
+    stopifnot(is.null(getOption(name)) && identical("", Sys.getenv(name))) }
+  for (empty in list("", logical(0), character(0), numeric(0), integer(0))) {
+    varVal = getRandVarName()
+    checkClean()
+    optArg = list(empty)
+    names(optArg) = name
+    options(optArg)
+    envArg = list(varVal)
+    names(envArg) = name
+    do.call(what = Sys.setenv, args = envArg)
+    if (is.null(getOption(name))) stop("Failed to set option: ", name)
+    if (identical("", Sys.getenv(name))) stop("Failed to set env var: ", name)
+    expect_equal(optOrVar(name), varVal)
+    optArg = list(NULL)
+    names(optArg) = name
+    options(optArg)
+    Sys.unsetenv(name)
+    checkClean()
   }
 })
 
 test_that("Name for which to fetch value must be text", {
-  for (n in list(NULL, c("PROCESSED", "RESOURCES"))) {
-    expect_error(optOrVar(!!n))
-  }
+  ns = list(NULL, c("PROCESSED", "RESOURCES"))
+  for (n in ns) { expect_error(optOrVar(!!n)) }
 })
