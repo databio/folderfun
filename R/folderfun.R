@@ -83,10 +83,12 @@ setff = function(name, path = NULL, currVar = NULL) {
 listff = function() {
   optionNames = names(options())
   pdirOpts = grep(.PDIROPTTAG, optionNames)
-  pdirOptNames = optionNames[pdirOpts]
-  pdirOptVals = options()[pdirOpts]
-  funcNames = paste0(.PDIRFUNCTAG, sub(.PDIROPTTAG, "", pdirOptNames))
-  cbind(funcNames, pdirOptVals)
+  if (length(pdirOpts) == 0) NULL else {
+  	pdirOptNames = optionNames[pdirOpts]
+	  pdirOptVals = options()[pdirOpts]
+	  funcNames = paste0(.PDIRFUNCTAG, sub(.PDIROPTTAG, "", pdirOptNames))
+	  cbind(funcNames, pdirOptVals)
+  }
 }
 
 
