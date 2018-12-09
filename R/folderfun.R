@@ -70,17 +70,23 @@ setff = function(name, path = NULL, currVar = NULL) {
 }
 
 
-#' Show project environment variables
+#' Display of project environment variables
 #'
-#' Displays the environment variables that are set and used by this package.
-#'@export
+#' \code{listff} displays a two-column matrix of function names 
+#' with which to access option / environment variable values 
+#' associated with this package, along with the current value 
+#' associated with each function.
+#'
+#' @return Two-column matrix in which first column contains function 
+#'    names and the second contains the value associated with each.
+#' @export
 listff = function() {
   optionNames = names(options())
   pdirOpts = grep(.PDIROPTTAG, optionNames)
   pdirOptNames = optionNames[pdirOpts]
   pdirOptVals = options()[pdirOpts]
   funcNames = paste0(.PDIRFUNCTAG, sub(.PDIROPTTAG, "", pdirOptNames))
-  cbind(pdirOptVals, funcNames)
+  cbind(funcNames, pdirOptVals)
 }
 
 
@@ -93,7 +99,7 @@ listff = function() {
 #' environment variable if and only if the \code{R} option 
 #' is not set or is an empty string or vector.
 #'
-#' @param name
+#' @param name The name of the option or env var to fetch
 #' @return The value associated with the given \code {name}, 
 #'    returning \code{NULL} if and only if the \code{name} is 
 #'    set neither as an option nor as environment variable.

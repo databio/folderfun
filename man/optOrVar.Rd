@@ -6,6 +6,9 @@
 \usage{
 optOrVar(name)
 }
+\arguments{
+\item{name}{The name of the option or env var to fetch}
+}
 \value{
 The value associated with the given \code {name}, 
    returning \code{NULL} if and only if the \code{name} is 
