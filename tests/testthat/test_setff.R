@@ -50,3 +50,41 @@ test_that("explicit value trumps variable, and using both emits warning", {
 		cleanFfSetting(target)
 	}
 })
+
+test_that("name to set can be interpreted as environment variable holding value", {
+	varVal = "dummyTestValue"
+	checkClean = function(vn) { if (!identical("", Sys.getenv(vn))) {
+		stop(sprintf("Name %s is already set as env var: %s", vn, Sys.getenv(vn))) } }
+	for (n in sapply(1:10, getRandVarName)) {
+		checkClean(n)
+		envArg = list(varVal)
+		names(envArg) = n
+		do.call(what = Sys.setenv, args = envArg)
+		if (identical("", Sys.getenv(n))) stop("Failed to set env var: ", n)
+		setff(n)
+		expect_equal(get(paste0(.PDIRFUNCTAG, !!n))(), varVal)
+		cleanFfSetting(n)
+		Sys.unsetenv(n)
+		checkClean(n)
+	}
+})
+
+test_that("name to set can be interpreted as name of current option holding value", {
+	varVal = "optionValueTest"
+	checkClean = function(opt) { if (!is.null(getOption(opt))) {
+		stop(sprintf("Option %s is already set", opt)) } }
+	for (n in sapply(1:10, getRandVarName)) {
+		checkClean(n)
+		optArg = list(varVal)
+		names(optArg) = n
+		options(optArg)
+		if (is.null(getOption(n))) stop("Failed to set option: ", n)
+		setff(n)
+		expect_equal(get(paste0(.PDIRFUNCTAG, !!n))(), varVal)
+		cleanFfSetting(n)
+		optArg = list(NULL)
+		names(optArg) = n
+		options(optArg)
+		checkClean(n)
+	}
+})
