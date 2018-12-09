@@ -17,9 +17,22 @@ test_that("result of function created matches value provided",  {
 	}
 })
 
-test_that("setting empty value is prohibited", {
+test_that("setting explicit empty is prohibited", {
 	for (val in c(NULL, "", character(0), logical(0), numeric(0), integer(0))) {
-		optName = paste0(sample(letters, sample(10:20)), collapse = "")
-		expect_error(setff(!!optName, val))
+		expect_error(setff(!!getRandVarName(), path = val))
 	}
 })
+
+test_that("attempt to derive value from empty varname is prohibited", {
+	for (val in c(NULL, "", character(0), logical(0), numeric(0), integer(0))) {
+		expect_error(setff(!!getRandVarName(), currVal = val))
+	}
+})
+
+test_that("explicit value or variable is required", {
+
+})
+
+test_that("explicit value is preferred to variable", {})
+
+test_that("explicit value + variable produces warning", {})
