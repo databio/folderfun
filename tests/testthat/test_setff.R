@@ -18,21 +18,28 @@ test_that("result of function created matches value provided",  {
 })
 
 test_that("setting explicit empty is prohibited", {
-	for (val in c(NULL, "", character(0), logical(0), numeric(0), integer(0))) {
-		expect_error(setff(!!getRandVarName(), path = val))
+	vals = list(NULL, "", character(0), logical(0), numeric(0), integer(0))
+	varnames = lapply(1:length(vals), getRandVarName)
+	for (i in 1:length(vals)) {
+		expect_error(setff(!!varnames[[i]], path = !!vals[[i]]))
 	}
 })
 
 test_that("attempt to derive value from empty varname is prohibited", {
-	for (val in c(NULL, "", character(0), logical(0), numeric(0), integer(0))) {
-		expect_error(setff(!!getRandVarName(), currVal = val))
+	vals = list(NULL, "", character(0), logical(0), numeric(0), integer(0))
+	varnames = lapply(1:length(vals), getRandVarName)
+	for (i in 1:length(vals)) {
+		expect_error(setff(!!varnames[[i]], currVal = !!vals[[i]]))
 	}
 })
 
 test_that("explicit value or variable is required", {
-
+	varnames = sapply(1:10, getRandVarName)
+	for (i in 1:length(varnames)) { expect_error(setff(!!varnames[i])) }
 })
 
-test_that("explicit value is preferred to variable", {})
+test_that("explicit value is preferred to variable", {
+	fixed = "explicit"
+})
 
 test_that("explicit value + variable produces warning", {})
