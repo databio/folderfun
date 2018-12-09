@@ -102,7 +102,7 @@ listff = function() {
 #' is not set or is an empty string or vector.
 #'
 #' @param name The name of the option or env var to fetch
-#' @return The value associated with the given \code {name}, 
+#' @return The value associated with the given \code{name}, 
 #'    returning \code{NULL} if and only if the \code{name} is 
 #'    set neither as an option nor as environment variable.
 #' @export
