@@ -23,7 +23,12 @@ A function named \code{ff<name>} that when executed without
    if any were provided.
 }
 \description{
-Creates a folder function for easy access to the directory
+Creates a folder function for easy access to the directory, named 
+by prepending a prefix specific to this package to the given \code{name}.
+If neither an explicit \code{path} not a \code{currVar} holding the value 
+to set is provided, then the given \code{name} will be treated as an option 
+or environment variable name, and those locations will be searched for the 
+value to be returned when the function created here is called.
 }
 \examples{
 setff("PROC", "/path/to/directory")

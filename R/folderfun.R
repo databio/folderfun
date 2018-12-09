@@ -23,7 +23,13 @@ NULL
 
 #' Create a folder function
 #'
-#' Creates a folder function for easy access to the directory
+#' Creates a folder function for easy access to the directory, named 
+#' by prepending a prefix specific to this package to the given \code{name}.
+#' If neither an explicit \code{path} not a \code{currVar} holding the value 
+#' to set is provided, then the given \code{name} will be treated as an option 
+#' or environment variable name, and those locations will be searched for the 
+#' value to be returned when the function created here is called.
+#' 
 #' @param name An immutable key given to identify the current folder, and used as a
 #'     string to create the new folder function
 #' @param path An absolute path to a folder that will be prepend when the
@@ -41,11 +47,8 @@ NULL
 #' setff("PROC", "/path/to/directory")
 setff = function(name, path = NULL, currVar = NULL) {
 	if (.isEmpty(path)) {
-		if (.isEmpty(currVar)) stop("To set a variable, path or currVar must be provided.")
-		path = optOrVar(currVar)
-		if (.isEmpty(path)) stop(sprintf(
-			"No value provided, and variable %s is empty", currVar))
-	} else if (!.isEmpty(currVar)) { warning("Explicit value provided; ignoring ", currVar) }
+    path = optOrVar(if (.isEmpty(currVar)) name else currVar)
+  } else if (!.isEmpty(currVar)) { warning("Explicit value provided; ignoring ", currVar) }
 	if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
 	l = list(path)
 	varName = paste0(.PDIROPTTAG, name)
