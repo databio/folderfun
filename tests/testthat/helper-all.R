@@ -6,7 +6,7 @@
 # Randomize lowercase alphabetic string of length in specified range.
 getRandVarName = function(minLen = 10, maxLen = 20) {
   if (minLen < 1 || maxLen < 1) stop(sprintf(
-    "Negative character count bound(s) for string randomization: %d, %d", 
+    "Character count bound(s) for string randomization must be positive; got [%d, %d]", 
     minLen, maxLen))
   if (maxLen < minLen) stop(sprintf(
     "Max chars < min chars for random string: %d < %d", maxLen, minLen))
