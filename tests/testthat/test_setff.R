@@ -11,7 +11,7 @@ test_that("there is no double slashes in the produced path",  {
   if (length(ns) != length(xs)) stop(sprintf(
     "%d names and %d values as test inputs", length(ns), length(xs)))
   for (i in 1:length(ns)) {
-    expect_true(.isEmpty(optOrVar(!!ns[i])))
+    expect_true(.isEmpty(optOrEnvVar(!!ns[i])))
     setff(ns[i], path = xs[i])
     expect_false(grepl(pattern="//", x=eval(get(paste0(.FFTAGFUNC, !!ns[i]))())))
     cleanFfSetting(ns[i])
@@ -24,7 +24,7 @@ test_that("result of function created matches value provided",  {
 	if (length(ns) != length(xs)) stop(sprintf(
 		"%d names and %d values as test inputs", length(ns), length(xs)))
 	for (i in 1:length(ns)) {
-		expect_true(.isEmpty(optOrVar(!!ns[i])))
+		expect_true(.isEmpty(optOrEnvVar(!!ns[i])))
 		setff(ns[i], path = xs[i])
 		expect_equal(eval(get(paste0(.FFTAGFUNC, !!ns[i]))()), !!xs[i])
 		cleanFfSetting(ns[i])

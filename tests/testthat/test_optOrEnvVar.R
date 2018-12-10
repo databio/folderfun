@@ -1,14 +1,14 @@
-# test_optOrVar.R
+# test_optOrEnvVar.R
 # Tests of name resolution search prioritization.
 # Author: Vince Reuter
 # Email: vpr9v@virginia.edu
 
-context("optOrVar")
+context("optOrEnvVar")
 
 test_that("NULL result when neither option nor env. var. is set", {
   for (n in sapply(1:10, getRandVarName)) {
     stopifnot(is.null(getOption(n)) && identical("", Sys.getenv(n)))  
-    expect_true(is.null(optOrVar(!!n)))
+    expect_true(is.null(optOrEnvVar(!!n)))
   }
 })
 
@@ -20,7 +20,7 @@ test_that("Option is recovered", {
     names(opts) = n
     options(opts)
     if (is.null(getOption(n))) stop("Failed to set option: ", n)
-    expect_equal(optOrVar(!!n), value)
+    expect_equal(optOrEnvVar(!!n), value)
     opts = list(NULL)
     names(opts) = n
     options(opts)
@@ -38,7 +38,7 @@ test_that("Environment variable is recovered", {
     names(args) = n
     do.call(what = Sys.setenv, args = args)
     if (.isEmpty(Sys.getenv(n))) stop("Failed to set env var: ", n)
-    expect_equal(optOrVar(!!n), value)
+    expect_equal(optOrEnvVar(!!n), value)
     Sys.unsetenv(n)
     checkClean(n)
   }
@@ -60,7 +60,7 @@ test_that("Option trumps environment variable", {
     names(envArg) = n
     do.call(Sys.setenv, args = envArg)
     stopifnot(!is.null(getOption(n)) && !identical("", Sys.getenv(n)))
-    expect_equal(optOrVar(!!n), !!optValues[i])
+    expect_equal(optOrEnvVar(!!n), !!optValues[i])
     Sys.unsetenv(n)
     optVal = list(NULL)
     names(optVal) = n
@@ -78,7 +78,7 @@ test_that("NULL result when option is empty", {
     names(optArg) = optname
     options(optArg)
     if (is.null(getOption(optname))) stop("Failed to set option: ", optname)
-    expect_true(is.null(optOrVar(optname)))
+    expect_true(is.null(optOrEnvVar(optname)))
     optArg = list(NULL)
     names(optArg) = optname
     options(optArg)
@@ -101,7 +101,7 @@ test_that("Empty opt doesn't block nonempty var", {
     do.call(what = Sys.setenv, args = envArg)
     if (is.null(getOption(name))) stop("Failed to set option: ", name)
     if (identical("", Sys.getenv(name))) stop("Failed to set env var: ", name)
-    expect_equal(optOrVar(name), varVal)
+    expect_equal(optOrEnvVar(name), varVal)
     optArg = list(NULL)
     names(optArg) = name
     options(optArg)
@@ -112,5 +112,5 @@ test_that("Empty opt doesn't block nonempty var", {
 
 test_that("Name for which to fetch value must be text", {
   ns = list(NULL, c("PROCESSED", "RESOURCES"))
-  for (n in ns) { expect_error(optOrVar(!!n)) }
+  for (n in ns) { expect_error(optOrEnvVar(!!n)) }
 })

@@ -2,7 +2,7 @@
 % Please edit documentation in R/folderfun.R
 \name{setff}
 \alias{setff}
-\title{Create a folder function}
+\title{Creator of function to reference project path.}
 \usage{
 setff(name, path = NULL, pathVar = NULL)
 }

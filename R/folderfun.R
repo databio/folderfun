@@ -21,7 +21,7 @@ NULL
 .FFTAGFUNC = "ff"
 
 
-#' Create a folder function
+#' Creator of function to reference project path.
 #'
 #' Creates a folder function for easy access to the directory, named 
 #' by prepending a prefix specific to this package to the given \code{name}.
@@ -47,7 +47,7 @@ NULL
 #' setff("PROC", "/path/to/directory")
 setff = function(name, path = NULL, pathVar = NULL) {
 	if (.isEmpty(path)) {
-    path = optOrVar(if (.isEmpty(pathVar)) name else pathVar)
+    path = optOrEnvVar(if (.isEmpty(pathVar)) name else pathVar)
   } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
 	if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
 	l = list(path)
@@ -71,49 +71,6 @@ setff = function(name, path = NULL, pathVar = NULL) {
 	assign(funcName, tempFunc, envir=globalenv())
 	message("Created folder function ", funcName, "(): ", tempFunc())
   return(tempFunc)
-}
-
-
-#' Display of project environment variables
-#'
-#' \code{listff} displays a two-column matrix of function names 
-#' with which to access option / environment variable values 
-#' associated with this package, along with the current value 
-#' associated with each function.
-#'
-#' @return Two-column matrix in which first column contains function 
-#'    names and the second contains the value associated with each.
-#' @export
-listff = function() {
-  optionNames = names(options())
-  pdirOpts = grep(.FFTAGOPT, optionNames)
-  if (length(pdirOpts) == 0) NULL else {
-  	pdirOptNames = optionNames[pdirOpts]
-	  pdirOptVals = options()[pdirOpts]
-	  funcNames = paste0(.FFTAGFUNC, sub(.FFTAGOPT, "", pdirOptNames))
-	  cbind(funcNames, pdirOptVals)
-  }
-}
-
-
-#' Retrieval of value associated with a name
-#'
-#' \code{optOrVar} retrieves that value assocaited with the 
-#' name provided as an argument, prioritizing in its search 
-#' by first interpreting the given argument as an \code{R}
-#' option name, and then trying an interpretation as an 
-#' environment variable if and only if the \code{R} option 
-#' is not set or is an empty string or vector.
-#'
-#' @param name The name of the option or env var to fetch
-#' @return The value associated with the given \code{name}, 
-#'    returning \code{NULL} if and only if the \code{name} is 
-#'    set neither as an option nor as environment variable.
-#' @export
-optOrVar = function(name) {
-	opt = getOption(name)
-	res = if (.nonempty(opt)) opt else Sys.getenv(name)
-	if (.nonempty(res)) res else NULL
 }
 
 
