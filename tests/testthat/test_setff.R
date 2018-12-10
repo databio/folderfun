@@ -5,6 +5,20 @@
 
 context("setff")
 
+test_that("there is no double slashes in the produced path",  {
+  ns = c("NEWPROCVAR", "RAND_DATA_VAR", "ProcData", "RawData")
+  xs = c("test/path", "//test/path", "/test/path//", "testpath//")
+  if (length(ns) != length(xs)) stop(sprintf(
+    "%d names and %d values as test inputs", length(ns), length(xs)))
+  for (i in 1:length(ns)) {
+    expect_true(.isEmpty(optOrVar(!!ns[i])))
+    setff(ns[i], path = xs[i])
+    # expect_equal(eval(get(paste0(.PDIRFUNCTAG, !!ns[i]))()), !!xs[i])
+    expect_false(grepl(pattern="//", x=eval(get(paste0(.PDIRFUNCTAG, !!ns[i]))())))
+    cleanFfSetting(ns[i])
+  }
+})
+
 test_that("result of function created matches value provided",  {
 	ns = c("NEWPROCVAR", "RAND_DATA_VAR", "ProcData", "RawData", "ROUT.DIR", "PROCESSED.PROJECT")
 	xs = c("processed", "/home/data", "proc/data", "RawData", "output", "proc_proj")
