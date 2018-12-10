@@ -25,7 +25,7 @@ NULL
 #'
 #' Creates a folder function for easy access to the directory, named 
 #' by prepending a prefix specific to this package to the given \code{name}.
-#' If neither an explicit \code{path} not a \code{currVar} holding the value 
+#' If neither an explicit \code{path} not a \code{pathVar} holding the value 
 #' to set is provided, then the given \code{name} will be treated as an option 
 #' or environment variable name, and those locations will be searched for the 
 #' value to be returned when the function created here is called.
@@ -34,7 +34,7 @@ NULL
 #'     string to create the new folder function
 #' @param path An absolute path to a folder that will be prepend when the
 #'     specified folder function is called
-#' @param currVar Name of the currently set variable whose value should 
+#' @param pathVar Name of the currently set variable whose value should 
 #'    be bound to \code{name}. First \code{getOption} is used, and then 
 #'    \code{Sys.getenv}.
 #' @return A function named \code{ff<name>} that when executed without 
@@ -45,10 +45,10 @@ NULL
 #'  detailed explanation of the concept
 #' @examples
 #' setff("PROC", "/path/to/directory")
-setff = function(name, path = NULL, currVar = NULL) {
+setff = function(name, path = NULL, pathVar = NULL) {
 	if (.isEmpty(path)) {
-    path = optOrVar(if (.isEmpty(currVar)) name else currVar)
-  } else if (!.isEmpty(currVar)) { warning("Explicit value provided; ignoring ", currVar) }
+    path = optOrVar(if (.isEmpty(pathVar)) name else pathVar)
+  } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
 	if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
 	l = list(path)
 	varName = paste0(.PDIROPTTAG, name)

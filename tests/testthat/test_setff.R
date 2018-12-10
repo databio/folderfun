@@ -57,7 +57,7 @@ test_that("explicit value trumps variable, and using both emits warning", {
 	target = "DUMMY_TEST_VAR"
 	varnames = sapply(1:10, getRandVarName)
 	for (i in 1:length(varnames)) {
-		expect_warning(setff(target, path = fixed, currVar = varnames[i]))
+		expect_warning(setff(target, path = fixed, pathVar = varnames[i]))
 		func = paste0(.PDIRFUNCTAG, "DUMMY_TEST_VAR")
 		expect_equal(eval(get(func)()), fixed)
 		cleanFfSetting(target)
