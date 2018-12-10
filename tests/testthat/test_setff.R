@@ -13,7 +13,6 @@ test_that("there is no double slashes in the produced path",  {
   for (i in 1:length(ns)) {
     expect_true(.isEmpty(optOrVar(!!ns[i])))
     setff(ns[i], path = xs[i])
-    # expect_equal(eval(get(paste0(.PDIRFUNCTAG, !!ns[i]))()), !!xs[i])
     expect_false(grepl(pattern="//", x=eval(get(paste0(.PDIRFUNCTAG, !!ns[i]))())))
     cleanFfSetting(ns[i])
   }
