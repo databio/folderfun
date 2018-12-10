@@ -17,7 +17,7 @@ getRandVarName = function(minLen = 10, maxLen = 20) {
 # and remove the variable storing its fetcher function.
 cleanFfSetting = function(n) {
   optArg = list(NULL)
-  names(optArg) = paste0(.PDIROPTTAG, n)
+  names(optArg) = paste0(.FFTAGOPT, n)
   options(optArg)
-  do.call(what = rm, args = list(paste0(.PDIRFUNCTAG, n), pos = globalenv()))
+  do.call(what = rm, args = list(paste0(.FFTAGFUNC, n), pos = globalenv()))
 }

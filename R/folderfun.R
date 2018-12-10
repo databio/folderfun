@@ -17,8 +17,8 @@ NULL
 
 
 # Global setting identifying options set by this package
-.PDIROPTTAG = "FF_"
-.PDIRFUNCTAG = "ff"
+.FFTAGOPT = "FF_"
+.FFTAGFUNC = "ff"
 
 
 #' Create a folder function
@@ -51,11 +51,11 @@ setff = function(name, path = NULL, pathVar = NULL) {
   } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
 	if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
 	l = list(path)
-	varName = paste0(.PDIROPTTAG, name)
+	varName = paste0(.FFTAGOPT, name)
 	names(l) = varName
 	# Set the option
 	options(l)
-	funcName = paste0(.PDIRFUNCTAG, name)
+	funcName = paste0(.FFTAGFUNC, name)
 	tempFunc = function(...) {
 	  userPath = .sanitizeUserPath(...)
 	  # First check if there's an R option with this name.
@@ -86,11 +86,11 @@ setff = function(name, path = NULL, pathVar = NULL) {
 #' @export
 listff = function() {
   optionNames = names(options())
-  pdirOpts = grep(.PDIROPTTAG, optionNames)
+  pdirOpts = grep(.FFTAGOPT, optionNames)
   if (length(pdirOpts) == 0) NULL else {
   	pdirOptNames = optionNames[pdirOpts]
 	  pdirOptVals = options()[pdirOpts]
-	  funcNames = paste0(.PDIRFUNCTAG, sub(.PDIROPTTAG, "", pdirOptNames))
+	  funcNames = paste0(.FFTAGFUNC, sub(.FFTAGOPT, "", pdirOptNames))
 	  cbind(funcNames, pdirOptVals)
   }
 }

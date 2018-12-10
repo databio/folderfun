@@ -13,7 +13,7 @@ test_that("there is no double slashes in the produced path",  {
   for (i in 1:length(ns)) {
     expect_true(.isEmpty(optOrVar(!!ns[i])))
     setff(ns[i], path = xs[i])
-    expect_false(grepl(pattern="//", x=eval(get(paste0(.PDIRFUNCTAG, !!ns[i]))())))
+    expect_false(grepl(pattern="//", x=eval(get(paste0(.FFTAGFUNC, !!ns[i]))())))
     cleanFfSetting(ns[i])
   }
 })
@@ -26,7 +26,7 @@ test_that("result of function created matches value provided",  {
 	for (i in 1:length(ns)) {
 		expect_true(.isEmpty(optOrVar(!!ns[i])))
 		setff(ns[i], path = xs[i])
-		expect_equal(eval(get(paste0(.PDIRFUNCTAG, !!ns[i]))()), !!xs[i])
+		expect_equal(eval(get(paste0(.FFTAGFUNC, !!ns[i]))()), !!xs[i])
 		cleanFfSetting(ns[i])
 	}
 })
@@ -58,7 +58,7 @@ test_that("explicit value trumps variable, and using both emits warning", {
 	varnames = sapply(1:10, getRandVarName)
 	for (i in 1:length(varnames)) {
 		expect_warning(setff(target, path = fixed, pathVar = varnames[i]))
-		func = paste0(.PDIRFUNCTAG, "DUMMY_TEST_VAR")
+		func = paste0(.FFTAGFUNC, "DUMMY_TEST_VAR")
 		expect_equal(eval(get(func)()), fixed)
 		cleanFfSetting(target)
 	}
@@ -75,7 +75,7 @@ test_that("name to set can be interpreted as environment variable holding value"
 		do.call(what = Sys.setenv, args = envArg)
 		if (identical("", Sys.getenv(n))) stop("Failed to set env var: ", n)
 		setff(n)
-		expect_equal(get(paste0(.PDIRFUNCTAG, !!n))(), varVal)
+		expect_equal(get(paste0(.FFTAGFUNC, !!n))(), varVal)
 		cleanFfSetting(n)
 		Sys.unsetenv(n)
 		checkClean(n)
@@ -93,7 +93,7 @@ test_that("name to set can be interpreted as name of current option holding valu
 		options(optArg)
 		if (is.null(getOption(n))) stop("Failed to set option: ", n)
 		setff(n)
-		expect_equal(get(paste0(.PDIRFUNCTAG, !!n))(), varVal)
+		expect_equal(get(paste0(.FFTAGFUNC, !!n))(), varVal)
 		cleanFfSetting(n)
 		optArg = list(NULL)
 		names(optArg) = n

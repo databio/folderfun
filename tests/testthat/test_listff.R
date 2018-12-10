@@ -15,8 +15,8 @@ test_that("variables table is accurate across variables count", {
   N = length(varnames)
   if (N != length(values)) stop(sprintf(
     "%d names and %d values", length(varnames), length(values)))
-  makeVarName = function(var) paste0(.PDIROPTTAG, var)
-  makeFunName = function(var) paste0(.PDIRFUNCTAG, var)
+  makeVarName = function(var) paste0(.FFTAGOPT, var)
+  makeFunName = function(var) paste0(.FFTAGFUNC, var)
   checkClean = function(ns) {
     extantVars = Filter(function(vn) !is.null(getOption(vn)), sapply(ns, makeVarName))
     if (length(extantVars) > 0) stop(
