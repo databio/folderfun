@@ -157,9 +157,51 @@ test_that("Environment variable lookup is case insensitive", {
 })
 
 test_that("Exact name lookup precedes case variation", {
-
-})
-
-test_that("Uppercase name variant precedes lowercase variation", {
-
+	exactVal = "exact"
+	upperVal = "upper"
+	lowerVal = "lower"
+	for (var in sapply(1:5, getRandVarName)) {
+		mixedVar = tomixed(var)
+		upperVar = toupper(var)
+		lowerVar = tolower(var)
+		allVars = c(mixedVar, upperVar, lowerVar)
+		for (v in allVars) { neitherOptNorEnvVar(v) }
+		for (nameType in c("opt", "envVar")) {
+			if (nameType == "opt") {
+				setVar = function(k, v) {
+					optArg = list(v)
+					names(optArg) = k
+					options(optArg)
+				}
+				check = function(k) { 
+					if (is.null(getOption(k))) { stop("Failed to set option: ", k) }
+				}
+				clean = function(k) {
+					optArg = list(NULL)
+					names(optArg) = k
+					options(optArg)
+				}
+			} else if (nameType == "envVar") {
+				setVar = function(k, v) {
+					envArg = list(v)
+					names(envArg) = k
+					do.call(what=Sys.setenv, args=envArg)
+				}
+				check = function(k) {
+					if (identical("",  Sys.getenv(k))) { stop("Failed to set env var: ", k) }
+				}
+				clean = function(k) { Sys.unsetenv(k) }
+			} else { stop("Invalid name type: ", nameType) }
+			setVar(mixedVar, exactVal)
+			setVar(upperVar, upperVal)
+			setVar(lowerVar, lowerVal)
+			for (v in allVars) { check(v) }
+			expect_equal(setff(mixedVar)(), exactVal)
+			for (v in allVars) {
+				clean(v)
+				neitherOptNorEnvVar(v)
+				validateFfCleanup(v)
+			}
+		}
+	}
 })
