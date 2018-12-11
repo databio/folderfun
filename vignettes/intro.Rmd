@@ -21,7 +21,7 @@ In a basic R project, you'll probably want to read in data and write out plots o
 
 `folderfun` solves all these issues by making it dead simple to use what I call *wrapper folder functions* to point to different data sources. Instead of pointing to input or output files with absolute file names, we define a function that is aware of the parent folder, and then use relative file names wrapped in the appropriate function. These project-level functions thus point to project-level folders so you don't have to hard-code paths more than once.
 
-`folderfun` also lets you take things a step further by using environment variables to define folder root locations. Using this system, you can define environment-wide folders, and then set up project-level sub folders with individual functions with almost no effort. This allows you to make your code more portable and sharable. It also enables multiple users to work together on complex projects in different compute environments while sharing a single code base.
+`folderfun` also lets you take things a step further by using `options` or environment variables to define folder root locations. Using this system, you can define environment-wide folders, and then set up project-level sub folders with individual functions with almost no effort. This allows you to make your code more portable and sharable. It also enables multiple users to work together on complex projects in different compute environments while sharing a single code base.
 
 ## Motivation and basic use case
 
@@ -39,31 +39,31 @@ write.table("/different/long/annoying/hard/coded/path/result.txt", output1)
 write.table("/different/long/annoying/hard/coded/path/result2.txt", output2)
 ```
 
-OK, that works... but this has got multiple problems: First, you repeat the paths,  making it harder to change, Second, if the data move, you have to update multiple things. Third, this script won't work in a different compute environment.
+OK, that works... but this has multiple problems: First, you repeat the paths,  making it harder to change. Second, if the data move, you have to update multiple things. Third, this script won't work in a different compute environment since filepaths will almost certainly differ.
 
 A better alternative would be to define our variable beforehand, and then use it in multiple places:
 
 ```{r, eval=FALSE}
-inputDir = "/long/and/annoying/path/to/hard/coded/file/"
-outputDir = "/different/long/annoying/hard/coded/path/"
+inputDir = "/long/and/annoying/path/to/hard/coded/file"
+outputDir = "/different/long/annoying/hard/coded/path"
 
-input1 = read.table(paste0(dataDir, "data.txt"))
-input2 = read.table(paste0(dataDir, "data2.txt"))
+input1 = read.table(file.path(dataDir, "data.txt"))
+input2 = read.table(file.path(dataDir, "data2.txt"))
 output1 = processData(input)
 output2 = processData2(input2)
 
 # Run other analysis...
 
-write.table(paste0(outputDir, "result.txt"))
-write.table(paste0(outputDir, "result2.txt"))
+write.table(file.path(outputDir, "result.txt"))
+write.table(file.path(outputDir, "result2.txt"))
 ```
 
-That's much nicer; it limits the hard-coded folders to a single variable per folder, making them easier to maintain. Plus, now someone else could re-use this script by just adjusting the variable pointers at the top. But that `paste0(dataDir, ...)` syntax is really annoying...`folderfun` makes this nicer.
+That's much nicer; it limits the hard-coded folders to a single variable per folder, making them easier to maintain. Plus, now someone else could re-use this script by just adjusting the variable pointers at the top. But that `file.path(...)` syntax is really annoying; `folderfun` makes this nicer.
 
 
 # Getting started with the `folderfun` approach
 
-With `folderfun`, we'll use a function called `setff` to create a new folder function that knows about each of our folders of interest. We assign each folder function a name (`In` and `Out` in this example), and provide the location to the folder:
+With `folderfun`, we'll use a function called `setff` to create functions, each of which will provide a path to a folder of interest. We assign each folder function a name (`In` and `Out` in this example), and provide the location to the folder:
 
 
 ```{r}
@@ -72,7 +72,7 @@ setff("In", "/long/and/annoying/path/to/hard/coded/file/")
 setff("Out", "/different/long/annoying/hard/coded/path/")
 ```
 
-These functions will create new, customized functions named according to our given name, prepended with the text *ff*. We can then get absolute paths to any files in those folders by passing a relative path to our newly created folder functions, like this:
+These functions will create new functions named by prepending the text *ff* to our given name. By passing just a relative path, we can then reference any file contained within a folder for which we've created an accessor with `setff`, like this:
 
 ```{r}
 ffIn("data.txt")
@@ -93,11 +93,11 @@ write.table(ffOut("result.txt"))
 write.table(ffOut("result2.txt"))
 ```
 
-So, to reiterate: when you create a folder function named "In", you now have access to a function called `ffIn()` that will access files in that directory. You can have as many folder functions you want with whatever names you like.
+So, to reiterate: when you create a folder function named "In", you now have access to a function called `ffIn` that will access files in the directory referenced in the `setff` cakk. You can have as many folder functions you want with whatever names you like, as long as the names differ. Creating a function with a name already in use will overwrite the older function with that name.
 
 ## Using environment variables
 
-Where `folderfun` package becomes useful is if you want to use environment variables (or `R options`) to eliminate the step of hard-coding *anything* in your R session. For example, say we put this code into our `.bashrc` or `.profile` to define the locations for this compute environment:
+Where `folderfun` becomes useful is if you want to use environment variables (or `R options`) to eliminate the step of hard-coding *anything* in your R session. For example, say we put this code into our `.bashrc` or `.profile` to define the locations for this compute environment:
 
 ```{bash, eval=FALSE}
 export INDIR="/long/and/annoying/path/to/hard/coded/file/"
@@ -110,7 +110,7 @@ Sys.setenv(INDIR="/long/and/annoying/path/to/hard/coded/file/")
 Sys.setenv(OUTDIR="/different/long/annoying/hard/coded/path/")
 ```
 
-alternatively, to use `R options`
+alternatively, to use `R options`:
 
 ```{r}
 options(INDIR="/long/and/annoying/path/to/hard/coded/file/")
@@ -135,14 +135,14 @@ ffIn("data.txt")
 alternatively, using `R options`
 
 ```{r}
-setff("In", file.path(getOption("INDIR", projName)))
-setff("Out", file.path(getOption("OUTDIR", projName)))
+setff("In", file.path(getOption("INDIR"), projName))
+setff("Out", file.path(getOption("OUTDIR"), projName))
 
 ffIn()
 ffIn("data.txt")
 ```
 
-By moving specification of the folder root structure into an environment variable, we've made the whole project ultra-portable. This script will run on any compute environment -- you just have to set the parent environment variables correctly.  No absolute paths will ever need to be changed within the script if data moves.
+By moving specification of the folder root structure into an environment variable, we've made the whole project ultra-portable. This runs on any compute environment -- you just have to set the parent environment variables correctly. No absolute paths will need to be changed if data moves.
 
 # Management
 
