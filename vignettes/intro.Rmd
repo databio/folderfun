@@ -144,6 +144,20 @@ ffIn("data.txt")
 
 By moving specification of the folder root structure into an environment variable, we've made the whole project ultra-portable. This runs on any compute environment -- you just have to set the parent environment variables correctly. No absolute paths will need to be changed if data moves.
 
+# Other usage style
+
+`setff` may be used in a few different ways to achieve the same goal. The most straightforward way is as above, providing the function name and the path that it should return. Alternatively, the name of a current `option` or environment variable may be used, or the name of the function to create may be interpreted as an `option` or environment variable to look up for value.
+
+```{r, eval=FALSE}
+setff("RESOURCES", "/path/to/resources/folder")
+setff("RESOURCES", pathVar="RESOURCES")
+setff("RESOURCES")
+```
+
+With `RESOURCES` set--either as an option or an environment variable--to `"/path/to/resources/folder"`, each of those usage styles will have the same effect and return value, enabling `ffRESOURCES(...)` to be used to obtain an absolute path. Note that in the second case, the name for the function need not match the name of the `option` or environment variable.
+
+In the most minimal pattern, e.g. `setff("RESOURCES")`, the name provided exactly determines the function name, but the strategy used to determine the path the function should reference can try a few different names. Succinctly, it favors `options` over environment variables, and first looks for a name exactly as given, trying an all-caps and then an all-lowercase version of the name until a nonempty value (neither `NULL` nor `""`) is found. So up to six names may be checked; if no match is found, the `setff` will result in error.
+
 # Management
 
 You can get a list of all your loaded folder functions with the `listff` function:
