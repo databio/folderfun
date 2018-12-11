@@ -47,7 +47,7 @@ NULL
 #' setff("PROC", "/path/to/directory")
 setff = function(name, path = NULL, pathVar = NULL) {
 	if (.isEmpty(path)) {
-    path = optOrEnvVar(if (.isEmpty(pathVar)) name else pathVar)
+    path = if (.isEmpty(pathVar)) .lookup(name) else optOrEnvVar(pathVar)
   } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
 	if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
 	l = list(path)
@@ -76,6 +76,16 @@ setff = function(name, path = NULL, pathVar = NULL) {
 
 .isEmpty = function(x) is.null(x) || identical(x, "") || length(x) == 0
 .nonempty = function(x) !.isEmpty(x)
+
+# Implement priority lookup of a name's value. For each name variant, first 
+# attempt lookup as option, then as environment variable. First try the 
+# name exactly as given, then as uppercase, finally as lowercase.
+.lookup = function(name) {
+  for (n in c(name, toupper(name), tolower(name))) {
+    res = optOrEnvVar(n)
+    if (.nonempty(res)) return(res)
+  }
+}
 
 
 # paste0() if given no values returns character(0); this doesn't play

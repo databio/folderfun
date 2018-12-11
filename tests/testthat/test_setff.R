@@ -101,3 +101,51 @@ test_that("name to set can be interpreted as name of current option holding valu
 		checkClean(n)
 	}
 })
+
+test_that("Option lookup is case insensitive", {
+	minLen = 10
+	maxLen = 20
+	var = getRandVarName(minLen=minLen, maxLen=maxLen)
+	val = "dummy_test_val"
+	checkClean = function(n) stopifnot(
+		is.null(getOption(n)) && identical("", Sys.getenv(n)))
+	tomixed = function(name) {
+		chars = unlist(strsplit(name, ""))		
+		indices = sample(1:length(chars), sample(1:(length(chars) - 1)))
+		mixed = sapply(1:length(chars), 
+			function(i) ifelse(i %in% indices, toupper(chars[i]), chars[i]))
+		paste0(mixed, collapse="")
+	}
+	typesAlwaysFound = c("tolower", "toupper")
+	caseTypes = c("tomixed", typesAlwaysFound)
+	for (setType in caseTypes) {
+		for (useType in caseTypes) {
+			setVar = get(setType)(var)
+			checkClean(setVar)
+			useVar = if (useType == setType) setVar else get(useType)(var)
+			checkClean(useVar)
+			optArg = list(val)
+			names(optArg) = setVar
+			options(optArg)
+			if (is.null(getOption(setVar))) stop("Failed to set option: ", setVar)
+			if (setType %in% typesAlwaysFound || setType == useType) { expect_equal(setff(!!useVar)(), val) }
+			else { expect_error(setff(!!useVar)(), "Attempted to set empty value *") }
+			optArg = list(NULL)
+			names(optArg) = setVar
+			options(optArg)
+			suppressWarnings(cleanFfSetting(useVar))
+		}
+	}
+})
+
+test_that("Environment variable lookup is case insensitive", {
+
+})
+
+test_that("Exact name lookup precedes case variation", {
+
+})
+
+test_that("Uppercase name variant precedes lowercase variation", {
+
+})
