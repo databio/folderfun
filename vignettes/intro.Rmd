@@ -156,7 +156,7 @@ setff("RESOURCES")
 
 With `RESOURCES` set--either as an option or an environment variable--to `"/path/to/resources/folder"`, each of those usage styles will have the same effect and return value, enabling `ffRESOURCES(...)` to be used to obtain an absolute path. Note that in the second case, the name for the function need not match the name of the `option` or environment variable.
 
-In the most minimal pattern, e.g. `setff("RESOURCES")`, the name provided exactly determines the function name, but the strategy used to determine the path the function should reference can try a few different names. Succinctly, it favors `options` over environment variables, and first looks for a name exactly as given, trying an all-caps and then an all-lowercase version of the name until a nonempty value (neither `NULL` nor `""`) is found. So up to six names may be checked; if no match is found, the `setff` will result in error.
+In the most minimal pattern, e.g. `setff("RESOURCES")`, the name provided exactly determines the function name, but the strategy used to determine the path the function should reference can try a few different names. Succinctly, it favors `options` over environment variables, and first looks for a name exactly as given, trying an all-caps and then an all-lowercase version of the name until a nonempty value (neither `NULL` nor `""`) is found. So up to six names may be checked; if no match is found, the `setff` call will result in error.
 
 # Management
 
@@ -165,3 +165,27 @@ You can get a list of all your loaded folder functions with the `listff` functio
 ```{r}
 listff()
 ```
+
+# Utilities
+
+As noted, `setff` can attempt to find a path value for an `option` or environment variable name. To do so, it uses a function called `optOrEnvVar` within this package. This implementation of prioritized name resolution may be useful in other contexts, so it's independently available:
+
+```{r, eval=FALSE}
+name = "DUMMYTESTVAR"
+value = "test_value"
+
+optOrEnvVar(name)                 # NULL
+Sys.setenv(name, value)
+optOrEnvVar(name)                 # Now resolves
+Sys.unsetenv(name)
+
+optOrEnvVar(name)                 # NULL
+optArg = list(value)
+names(optArg) = name
+options(optArg)
+optOrEnvVar(name)                 # Now resolves
+
+Sys.setenv(name, "new?")
+optOrEnvVar(name)                 # on name collision, option trumps environment variable.
+```
+
