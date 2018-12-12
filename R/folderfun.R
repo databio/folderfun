@@ -70,7 +70,7 @@ setff = function(name, path = NULL, pathVar = NULL) {
 	}
 	assign(funcName, tempFunc, envir=globalenv())
 	message("Created folder function ", funcName, "(): ", tempFunc())
-  return(tempFunc)
+  invisible(tempFunc)
 }
 
 
