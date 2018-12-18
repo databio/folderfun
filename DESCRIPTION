@@ -16,7 +16,8 @@ Maintainer: Nathan C. Sheffield <nathan@code.databio.org>
 Depends:
     R (> 3.0)
 Suggests:
-    knitr
+    knitr, 
+    testthat
 VignetteBuilder: knitr
 License: BSD_2_clause + file LICENSE
 RoxygenNote: 6.1.1
