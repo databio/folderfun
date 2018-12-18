@@ -3,5 +3,5 @@ language: r
 r: devel
 sudo: false
 cache: packages
-use_bioc: true
-bioc_required: true
+use_bioc: false
+bioc_required: false
