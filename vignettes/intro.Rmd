@@ -15,19 +15,20 @@ knitr::opts_chunk$set(results="hold", collapse=TRUE)
 
 # Overview
 
-The `folderfun` (short for *folder functions*) package makes it easy for you to manage disk resources for your R project.
+The `folderfun` (short for *folder functions*) package makes it easy for you to manage files on disk for your R project.
 
-In a basic R project, you'll probably want to read in data and write out plots or result tables. By default, the reading, plotting, and writing functions will read or write files in your current working directory. Fine for small, simple projects, but big projects can require multiple folders for each input and output. These folders can be organized in different ways and reside on different file systems. It can become a nightmare to keep track of the locations of all the folders on disk where different data and results are stored. And if you start hard-coding paths, you make your code less portable, because it will only be able to be run in that computing environment. What if data changes locations? Your code breaks.
+In a basic R project, you'll probably want to read in data and write out plots or results. By default, the reading, plotting, and writing functions will read or write files in your current working directory. That might be fine for small, simple projects, but but it breaks down for many real-world use cases.
 
-`folderfun` solves all these issues by making it dead simple to use what I call *wrapper folder functions* to point to different data sources. Instead of pointing to input or output files with absolute file names, we define a function that is aware of the parent folder, and then use relative file names wrapped in the appropriate function. These project-level functions thus point to project-level folders so you don't have to hard-code paths more than once.
+For example, what if you save your R project as a git repository (which is a good idea)? You don't want to store large, compressed input files in the same folder, nor do you want to commit your plot outputs. Instead, you'll want to store the data and results in other folders. Large projects can also require multiple folders for both input and output -- for example, you may load some shared data resource that lives in a group folder as well as some of your own project-specific resources. What if you want to work on a project with multiple people? These distributed folders can be organized in different ways and reside on different file systems in different computing environments. It can become a nightmare to keep track of the locations of all the folders on disk where different data and results are stored. And if you start hard-coding paths inside your R script, you make your code less portable, because it will only be able to be run in that computing environment. What if data changes locations? Your code breaks.
 
-`folderfun` also lets you take things a step further by using `options` or environment variables to define folder root locations. Using this system, you can define environment-wide folders, and then set up project-level sub folders with individual functions with almost no effort. This allows you to make your code more portable and sharable. It also enables multiple users to work together on complex projects in different compute environments while sharing a single code base.
+`folderfun` solves all these issues by making it dead simple to use *wrapper folder functions* to point to different data sources. Instead of pointing to input or output files with absolute file names, we define a function that remembers a root folder, and then use relative filenames with that function to identify individual files. Coupled with environment variables that define parent folder locations, you can easily maintain project-level subfolders with code that works across individuals and computing environments with almost no effort. This makes your code more portable and sharable and enables multiple users to work together on complex projects in different compute environments while sharing a single code base. Are you convinced yet?
 
 ## Motivation and basic use case
 
 Let's say we have a project that needs to read data from one folder, let's call it `data`, and write results to another folder, let's call it `results`. Here's how you might start this analysis naively:
 
 ```{r, eval=FALSE}
+# Load our data:
 input1 = read.table("/long/and/annoying/path/to/hard/coded/file/data.txt")
 input2 = read.table("/long/and/annoying/path/to/hard/coded/file/data2.txt")
 output1 = processData(input)
@@ -35,13 +36,14 @@ output2 = processData2(input2)
 
 # Run other analysis...
 
+# Now write results:
 write.table("/different/long/annoying/hard/coded/path/result.txt", output1)
 write.table("/different/long/annoying/hard/coded/path/result2.txt", output2)
 ```
 
 OK, that works... but this has multiple problems: First, you repeat the paths,  making it harder to change. Second, if the data move, you have to update multiple things. Third, this script won't work in a different compute environment since filepaths will almost certainly differ.
 
-A better alternative would be to define our variable beforehand, and then use it in multiple places:
+A better alternative would be to define a path variable beforehand, and then use it in multiple places:
 
 ```{r, eval=FALSE}
 inputDir = "/long/and/annoying/path/to/hard/coded/file"
