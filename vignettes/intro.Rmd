@@ -156,11 +156,13 @@ But wait, there's more! If your folder function name matches the name of the `pa
 setff("Indir")
 ```
 
-The name provided exactly determines the function name, and also specifies a priority of places to search for a `pathVar` variable: It favors `options` over environment variables, and first looks for a name exactly as given, trying an all-caps and then an all-lowercase version of the name until a nonempty value (neither `NULL` nor `""`) is found. If no match is found, the `setff` call will result in error.
+The name provided exactly determines the function name, and also specifies a priority of places to search for a `pathVar` variable: It favors R `options` over environment variables, and first looks for a name exactly as given, trying an all-caps and then an all-lowercase version of the name until a nonempty value (neither `NULL` nor `""`) is found. If no match is found, the `setff` call will result in error.
 
-# Setting project-specific folders
+# Setting project-specific folders with the prepend argument
 
-So far we've addressed how to create universal folder functions. We may also want project-specific folder functions...
+So far we've addressed how to create universal folder functions. We've solved the main problems with the traditional approach. Using folder folders combined with R options or environment variables allows us to: 1) Avoid repeating paths either within a script or across scripts, because they are stored globally; 2) Let the exact same script work in two different computing environments. We can do all of this with a simple, easy-to-understand call to `setff`, and then wrapping all our references to disk resources with the appropriate `ff` function.
+
+But one thing we haven't yet identified is the possibility of project-specific folders. We might want an `input` or `output` folder that...
 
 
 # Management and utilities
