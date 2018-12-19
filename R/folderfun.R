@@ -37,6 +37,8 @@ NULL
 #' @param pathVar Name of the currently set variable whose value should 
 #'    be bound to \code{name}. First \code{getOption} is used, and then 
 #'    \code{Sys.getenv}.
+#' @param postpend Value(s) with which to make subpath relative to main \code{path} 
+#'    or value fetched from option or environment variable.
 #' @return A function named \code{ff<name>} that when executed without 
 #'    arguments points to the \code{path} and appends the provided argument to it
 #'    if any were provided.
@@ -45,11 +47,16 @@ NULL
 #'  detailed explanation of the concept
 #' @examples
 #' setff("PROC", "/path/to/directory")
-setff = function(name, path = NULL, pathVar = NULL) {
+setff = function(name, path = NULL, pathVar = NULL, postpend = NULL) {
 	if (.isEmpty(path)) {
     path = if (.isEmpty(pathVar)) .lookup(name) else optOrEnvVar(pathVar)
+    if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
   } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
-	if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
+  if (.nonempty(postpend)) {
+    if (is.character(postpend)) { postpend = list(postpend) }
+    if (is.list(postpend)) { path = file.path(path, do.call(file.path, postpend)) }
+    else { stop(sprintf("Invalid argument to postpend: %s (%s)", postpend, class(postpend))) }
+  }
 	l = list(path)
 	varName = paste0(.FFTAGOPT, name)
 	names(l) = varName

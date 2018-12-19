@@ -4,7 +4,7 @@
 \alias{setff}
 \title{Creator of function to reference project path.}
 \usage{
-setff(name, path = NULL, pathVar = NULL)
+setff(name, path = NULL, pathVar = NULL, postpend = NULL)
 }
 \arguments{
 \item{name}{An immutable key given to identify the current folder, and used as a
@@ -16,6 +16,9 @@ specified folder function is called}
 \item{pathVar}{Name of the currently set variable whose value should 
 be bound to \code{name}. First \code{getOption} is used, and then 
 \code{Sys.getenv}.}
+
+\item{postpend}{Value(s) with which to make subpath relative to main \code{path} 
+or value fetched from option or environment variable.}
 }
 \value{
 A function named \code{ff<name>} that when executed without 
