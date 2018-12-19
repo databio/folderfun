@@ -29,8 +29,8 @@ Let's say we have a project that needs to read data from one folder, let's call 
 
 ```{r, eval=FALSE}
 # Load our data:
-input1 = read.table("/long/and/annoying/path/to/hard/coded/file/data.txt")
-input2 = read.table("/long/and/annoying/path/to/hard/coded/file/data2.txt")
+input1 = read.table("/long/and/annoying/hard/coded/path/data.txt")
+input2 = read.table("/long/and/annoying/hard/coded/path/data2.txt")
 output1 = processData(input)
 output2 = processData2(input2)
 
@@ -41,16 +41,16 @@ write.table("/different/long/annoying/hard/coded/path/result.txt", output1)
 write.table("/different/long/annoying/hard/coded/path/result2.txt", output2)
 ```
 
-OK, that works... but this has multiple problems: First, you repeat the paths,  making it harder to change. Second, if the data move, you have to update multiple things. Third, this script won't work in a different compute environment since filepaths will almost certainly differ.
+OK, that works... but this has problems: First, you repeat the paths, making it harder to change if the data move; Second, if you want to refer to these same locations in a different script, you'd have to repeat the paths yet further; and Third, this script won't work in a different compute environment since filepaths may differ. 
 
-A better alternative would be to define a path variable beforehand, and then use it in multiple places:
+We can solve the first problem by defining a path variable, and then using it in multiple places:
 
 ```{r, eval=FALSE}
-inputDir = "/long/and/annoying/path/to/hard/coded/file"
+inputDir = "/long/and/annoying/hard/coded/path"
 outputDir = "/different/long/annoying/hard/coded/path"
 
-input1 = read.table(file.path(dataDir, "data.txt"))
-input2 = read.table(file.path(dataDir, "data2.txt"))
+input1 = read.table(file.path(inputDir, "data.txt"))
+input2 = read.table(file.path(inputDir, "data2.txt"))
 output1 = processData(input)
 output2 = processData2(input2)
 
@@ -60,21 +60,21 @@ write.table(file.path(outputDir, "result.txt"))
 write.table(file.path(outputDir, "result2.txt"))
 ```
 
-That's much nicer; it limits the hard-coded folders to a single variable per folder, making them easier to maintain. Plus, now someone else could re-use this script by just adjusting the variable pointers at the top. But that `file.path(...)` syntax is really annoying; `folderfun` makes this nicer.
+That's much nicer; it limits the hard-coded folders to a single variable per folder, making them easier to maintain. Plus, now someone else could re-use this script by just adjusting the variable pointers at the top. But we still haven't solved the problems of using these variables in another or using this script in another environment. And besides, that `file.path(...)` syntax is really annoying! With `folderfun` we can do better.
 
 
 # Getting started with the `folderfun` approach
 
-With `folderfun`, we'll use a function called `setff` to create functions, each of which will provide a path to a folder of interest. We assign each folder function a name (`In` and `Out` in this example), and provide the location to the folder:
+With `folderfun`, we'll use a function called `setff` to create functions, each of which will provide a path to a folder of interest. This is analogous to what we're trying to do with `inputDir` and `outputDir` above, we just use a function call instead of a variable. We assign each folder function a name (`In` and `Out` in this example), and provide the location to the folder:
 
 
 ```{r}
 library(folderfun)
-setff("In", "/long/and/annoying/path/to/hard/coded/file/")
+setff("In", "/long/and/annoying/hard/coded/path/")
 setff("Out", "/different/long/annoying/hard/coded/path/")
 ```
 
-These functions will create new functions named by prepending the text *ff* to our given name. By passing just a relative path, we can then reference any file contained within a folder for which we've created an accessor with `setff`, like this:
+These functions have created new functions named by prepending the text *ff* (for *folder function*) to our given name. These functions allow us to build paths to files inside those folders by simply passing a relative path (filename), like this:
 
 ```{r}
 ffIn("data.txt")
@@ -95,40 +95,37 @@ write.table(ffOut("result.txt"))
 write.table(ffOut("result2.txt"))
 ```
 
-So, to reiterate: when you create a folder function named "In", you now have access to a function called `ffIn` that will access files in the directory referenced in the `setff` cakk. You can have as many folder functions you want with whatever names you like, as long as the names differ. Creating a function with a name already in use will overwrite the older function with that name.
+So, to reiterate: `setff("In", ...)` creates a *folder function* called `ffIn` that will prepend the `inputDir` path, giving you easy access to files in the directory referenced in the `setff` call. You can have as many folder functions you want with whatever names you like, as long as the names differ. Creating a function with a name already in use will overwrite the older function with that name.
 
-## Using environment variables
+## Using environment variables or R options to make folder functions portable
 
-Where `folderfun` becomes useful is if you want to use environment variables (or `R options`) to eliminate the step of hard-coding *anything* in your R session. For example, say we put this code into our `.bashrc` or `.profile` to define the locations for this compute environment:
+Great, this syntax is really much nicer than what we had before. But we still haven't solved the problem of multiple scripts that refer to these same folders, or sharing scripts across computing environments. But what if there was a way to share *folder functions*? This is where `folderfun` becomes very useful. By using environment variables (or `R options`), we eliminate the step of hard-coding *anything* in the R session.
+
+For example, say we put this code into our `.bashrc` or `.profile` to define the locations for this compute environment:
 
 ```{bash, eval=FALSE}
-export INDIR="/long/and/annoying/path/to/hard/coded/file/"
+export INDIR="/long/and/annoying/hard/coded/path/"
 export OUTDIR="/different/long/annoying/hard/coded/path/"
 ```
 
 
 ```{r include=FALSE}
-Sys.setenv(INDIR="/long/and/annoying/path/to/hard/coded/file/")
+Sys.setenv(INDIR="/long/and/annoying/hard/coded/path/")
 Sys.setenv(OUTDIR="/different/long/annoying/hard/coded/path/")
 ```
 
-alternatively, to use `R options`:
+Or, say we used `R options` to do something similar:
 
 ```{r}
 options(INDIR="/long/and/annoying/path/to/hard/coded/file/")
 options(OUTDIR="/different/long/annoying/hard/coded/path/")
 ```
-This is useful because it lets you create create project-level input and output folders that are sub folders of generic folders, and you can outsource the specification of the root directories to your `.profile`.
 
-## Project-level 
-
-So, assume we've set `INDIR` and `OUTDIR` as bash variables in `.bashrc` as presented above. Now all we need to do to establish project-specific sub directories is this:
+Setting these variables creates a global variable that can be read by any R script. Furthermore, we could define these variables differently on different systems. We have effectively outsourced the specification of the root directories to our `.Rprofile` or `.bashrc`. Now, all we need to do is use the global variables to build our folder functions. We could do this like so:
 
 ```{r}
-projName="myproject"
-
-setff("In", file.path(Sys.getenv("INDIR", projName)))
-setff("Out", file.path(Sys.getenv("OUTDIR", projName)))
+setff("In", Sys.getenv("INDIR"))
+setff("Out", Sys.getenv("OUTDIR"))
 
 ffIn()
 ffIn("data.txt")
@@ -137,38 +134,42 @@ ffIn("data.txt")
 alternatively, using `R options`
 
 ```{r}
-setff("In", file.path(getOption("INDIR"), projName))
-setff("Out", file.path(getOption("OUTDIR"), projName))
+setff("In", getOption("INDIR"))
+setff("Out", getOption("OUTDIR"))
 
 ffIn()
 ffIn("data.txt")
 ```
 
-By moving specification of the folder root structure into an environment variable, we've made the whole project ultra-portable. This runs on any compute environment -- you just have to set the parent environment variables correctly. No absolute paths will need to be changed if data moves.
+But it gets even easier: we've wrapped the `Sys.getenv` and `getOption` calls into `setff` so you just need to specify the global variable name to the `pathVar` argument:
 
-# Other usage style
-
-`setff` may be used in a few different ways to achieve the same goal. The most straightforward way is as above, providing the function name and the path that it should return. Alternatively, the name of a current `option` or environment variable may be used, or the name of the function to create may be interpreted as an `option` or environment variable to look up for value.
 
 ```{r, eval=FALSE}
-setff("RESOURCES", "/path/to/resources/folder")
-setff("RESOURCES", pathVar="RESOURCES")
-setff("RESOURCES")
+setff("In", pathVar="INDIR")
 ```
 
-With `RESOURCES` set--either as an option or an environment variable--to `"/path/to/resources/folder"`, each of those usage styles will have the same effect and return value, enabling `ffRESOURCES(...)` to be used to obtain an absolute path. Note that in the second case, the name for the function need not match the name of the `option` or environment variable.
+When you pass the `pathVar` argument, `setff` will look first for an R option with that name, and then for an environment variable with that name. So, this has the same effect as above, but no longer requires specifying the path directly in any particular R script.
 
-In the most minimal pattern, e.g. `setff("RESOURCES")`, the name provided exactly determines the function name, but the strategy used to determine the path the function should reference can try a few different names. Succinctly, it favors `options` over environment variables, and first looks for a name exactly as given, trying an all-caps and then an all-lowercase version of the name until a nonempty value (neither `NULL` nor `""`) is found. So up to six names may be checked; if no match is found, the `setff` call will result in error.
+But wait, there's more! If your folder function name matches the name of the `pathVar`, then you don't even need to provide the `pathVar`. For example, say we wanted to name our folder function `ffIndir` instead of just `ffIn`. In that case, you'd get the same result with:
 
-# Management
+```{r, eval=FALSE}
+setff("Indir")
+```
+
+The name provided exactly determines the function name, and also specifies a priority of places to search for a `pathVar` variable: It favors `options` over environment variables, and first looks for a name exactly as given, trying an all-caps and then an all-lowercase version of the name until a nonempty value (neither `NULL` nor `""`) is found. If no match is found, the `setff` call will result in error.
+
+# Setting project-specific folders
+
+So far we've addressed how to create universal folder functions. We may also want project-specific folder functions...
+
+
+# Management and utilities
 
 You can get a list of all your loaded folder functions with the `listff` function:
 
 ```{r}
 listff()
 ```
-
-# Utilities
 
 As noted, `setff` can attempt to find a path value for an `option` or environment variable name. To do so, it uses a function called `optOrEnvVar` within this package. This implementation of prioritized name resolution may be useful in other contexts, so it's independently available:
 
