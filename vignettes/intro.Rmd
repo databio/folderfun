@@ -193,7 +193,24 @@ You can get a list of all your loaded folder functions with the `listff` functio
 listff()
 ```
 
-As noted, `setff` can attempt to find a path value for an `option` or environment variable name. To do so, it uses a function called `optOrEnvVar` within this package. This implementation of prioritized name resolution may be useful in other contexts, so it's independently available:
+# A complete real-world example
+
+Now let's see how this fits into a real-world system. In our lab, we have set aside a few locations on our primary server where we store both raw and processed data, and we store the folder locations in shell environment variables called `$RAWDATA` and `$PROCESSED`. We also have a few other variables that point to shared resources, like `$RESOURCES` and `$GENOMES`. Our server uses an environment modules system, so we have set up a lab environment module that populates these variables. If we ever need to move anything to a new file system, it's as simple as updating the environment module, and all lab members' pointers will automatically point to the new folder.
+
+We use `folderfun` to access these folders in R. By convention, we assign a subfolder for each project in each of the `RAW` and `PROCESSED` folders. Then, we simply need to have this code in each script:
+
+```
+projectName="myproject"
+setff("Raw", postpend=projectName)
+setff("Processed", postpend=projectName)
+```
+
+Because every project is the same, we've wrapped this capability into another function called `projectInit`, so we must merely put `projectInit(projectName)` at the beginning of each script, and it will have access to the folder functions it needs. The beautiful thing about this approach is that these scripts are now automatically functional on any computing environment and are robust to data moves as long as the environment variables are kept up-to-date.
+
+
+# Some final advanced notes
+
+As noted, `setff` attempts to find a path value for either an R option or a shell environment variable. To do so, it uses a function called `folderfun::optOrEnvVar` in this package. This prioritized name resolution function may be useful in other contexts, so it's independently available:
 
 ```{r, eval=FALSE}
 name = "DUMMYTESTVAR"
