@@ -166,6 +166,11 @@ So far we've addressed how to create universal folder functions. We've solved th
 
 But let's go one step further: what if we want more than just a set of global folders. What if we also want to specify project-specific folders? We might want an `input` or `output` subfolder that reside in our parent `INDIR` and `OUTDIR` folders, but give us a separate space for each project. This is possible with another `setff` argument: `postpend`. Using `postpend` allows you to append additional text (*e.g.* subfolders) to the folder function. For example, here's some code that will give you a subfolder called `projectName` at the location specified by your `$DATA` environment variable:
 
+```{r, echo=FALSE}
+# We should populate this variable to use it in the next section
+options(DATA="/long/and/annoying/path/to/hard/coded/file/")
+```
+
 ```{r}
 projectName="myproject"
 setff("Data", pathVar="DATA", postpend=projectName)
