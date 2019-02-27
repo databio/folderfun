@@ -1,0 +1,7 @@
+language: r
+# Using R devel since Bioconductor devel uses it
+r: devel
+sudo: false
+cache: packages
+use_bioc: false
+bioc_required: false

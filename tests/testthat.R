@@ -1,4 +1,4 @@
-library(testthat)
-library("GenomicDistributions")
+library("testthat")
+library("folderfun")
 
-test_check("GenomicDistributions")
+test_check("folderfun")

@@ -2,23 +2,36 @@
 % Please edit documentation in R/folderfun.R
 \name{setff}
 \alias{setff}
-\title{Create a folder function}
+\title{Creator of function to reference project path.}
 \usage{
-setff(name, location)
+setff(name, path = NULL, pathVar = NULL, postpend = NULL)
 }
 \arguments{
 \item{name}{An immutable key given to identify the current folder, and used as a
 string to create the new folder function}
 
-\item{location}{An absolute path to a folder that will be prepend when the
+\item{path}{An absolute path to a folder that will be prepend when the
 specified folder function is called}
+
+\item{pathVar}{Name of the currently set variable whose value should 
+be bound to \code{name}. First \code{getOption} is used, and then 
+\code{Sys.getenv}.}
+
+\item{postpend}{Value(s) with which to make subpath relative to main \code{path} 
+or value fetched from option or environment variable.}
 }
 \value{
 A function named \code{ff<name>} that when executed without 
-arguments points to the \code{location} and appends the provided argument to it.
+   arguments points to the \code{path} and appends the provided argument to it
+   if any were provided.
 }
 \description{
-Creates a folder function for easy access to the directory
+Creates a folder function for easy access to the directory, named 
+by prepending a prefix specific to this package to the given \code{name}.
+If neither an explicit \code{path} not a \code{pathVar} holding the value 
+to set is provided, then the given \code{name} will be treated as an option 
+or environment variable name, and those locations will be searched for the 
+value to be returned when the function created here is called.
 }
 \examples{
 setff("PROC", "/path/to/directory")
