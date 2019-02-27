@@ -131,6 +131,9 @@ test_that("Option lookup is case insensitive", {
 })
 
 test_that("Environment variable lookup is case insensitive", {
+	# Windows and MACOS have case-insensitive file systems.
+	skip_on_os("windows")
+	skip_on_os("mac")	
 	minLen = 10
 	maxLen = 20
 	var = getRandVarName(minLen=minLen, maxLen=maxLen)
@@ -157,6 +160,9 @@ test_that("Environment variable lookup is case insensitive", {
 })
 
 test_that("Exact name lookup precedes case variation", {
+	# Windows and MACOS have case-insensitive file systems.
+	skip_on_os("windows")
+	skip_on_os("mac")
 	exactVal = "exact"
 	upperVal = "upper"
 	lowerVal = "lower"

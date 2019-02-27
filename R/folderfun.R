@@ -39,6 +39,10 @@ NULL
 #'    \code{Sys.getenv}.
 #' @param postpend Value(s) with which to make subpath relative to main \code{path} 
 #'    or value fetched from option or environment variable.
+#' @param loadEnvir    An environment. Into which environment would you like to
+#'     load the function? Defaults to \code{\link[base]{globalenv}}. You can
+#'     replace this with  \code{\link[base]{parent.frame}} to restrict the scope
+#'     of created functions.
 #' @return A function named \code{ff<name>} that when executed without 
 #'    arguments points to the \code{path} and appends the provided argument to it
 #'    if any were provided.
@@ -47,36 +51,39 @@ NULL
 #'  detailed explanation of the concept
 #' @examples
 #' setff("PROC", "/path/to/directory")
-setff = function(name, path = NULL, pathVar = NULL, postpend = NULL) {
-	if (.isEmpty(path)) {
+setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
+    loadEnvir=globalenv()) {
+    if (.isEmpty(path)) {
     path = if (.isEmpty(pathVar)) .lookup(name) else optOrEnvVar(pathVar)
     if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
   } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
   if (.nonempty(postpend)) {
     if (is.character(postpend)) { postpend = list(postpend) }
-    if (is.list(postpend)) { path = file.path(path, do.call(file.path, postpend)) }
+    if (is.list(postpend)) {
+        path = file.path(path, do.call(file.path, postpend))
+    }
     else { stop(sprintf("Invalid argument to postpend: %s (%s)", postpend, class(postpend))) }
   }
-	l = list(path)
-	varName = paste0(.FFTAGOPT, name)
-	names(l) = varName
-	# Set the option
-	options(l)
-	funcName = paste0(.FFTAGFUNC, name)
-	tempFunc = function(...) {
-	  userPath = .sanitizeUserPath(...)
-	  # First check if there's an R option with this name.
-	  parentFolder = getOption(varName)
-	  if (is.null(parentFolder)) {
-	    stop("No parent folder found for variable ", name)
-	  }
-	  outputPath = if (.isEmpty(userPath)) parentFolder else file.path(parentFolder, userPath)
-	  # prevent returing paths with double slashes
-	  outputPath = gsub("//","/",outputPath)
-	  return(outputPath)	
-	}
-	assign(funcName, tempFunc, envir=globalenv())
-	message("Created folder function ", funcName, "(): ", tempFunc())
+    # prevent returning paths with double slashes
+    l = list(gsub("//","/", path))
+    varName = paste0(.FFTAGOPT, name)
+    names(l) = varName
+    # Set the option
+    options(l)
+    funcName = paste0(.FFTAGFUNC, name)
+    tempFunc = function(...) {
+      userPath = .sanitizeUserPath(...)
+      # First check if there's an R option with this name.
+      parentFolder = getOption(varName)
+      if (is.null(parentFolder)) {
+        stop("No parent folder found for variable ", name)
+      }
+      outputPath = if (.isEmpty(userPath)) parentFolder else file.path(parentFolder, userPath)
+
+      return(outputPath)    
+    }
+    assign(funcName, tempFunc, envir=loadEnvir)
+    message("Created folder function ", funcName, "(): ", tempFunc())
   invisible(tempFunc)
 }
 
