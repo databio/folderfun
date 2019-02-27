@@ -73,6 +73,7 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
     funcName = paste0(.FFTAGFUNC, name)
     tempFunc = function(...) {
       userPath = .sanitizeUserPath(...)
+      userPath = file.path(...)
       # First check if there's an R option with this name.
       parentFolder = getOption(varName)
       if (is.null(parentFolder)) {
@@ -113,4 +114,16 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
     userPath = ""
   }
   return(userPath)
+}
+
+file.path = function(...) {
+    sep = .Platform$file.sep
+    l = list(...)
+    checkForBads = sapply(list(...), identical, character(0))
+    if (length(checkForBads) > 0) {
+      l[checkForBads] = ""
+    }
+    fp = do.call(base::file.path, l)
+    result = gsub(paste0(sep,"{2,}"), sep, fp, fixed=FALSE, perl=TRUE)
+    return(result)
 }
