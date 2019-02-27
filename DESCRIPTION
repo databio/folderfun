@@ -1,6 +1,6 @@
 Package: folderfun
-Version: 0.0.2
-Date: 2018-05
+Version: 0.1
+Date: 2019-02-26
 Title: Creates and Manages Folder Functions for Portable Large-scale R Analysis
 Description: If you find yourself working on multiple different projects in R, you'll want a 
 	series of folders pointing to raw data, processed data, plot results, intermediate table 
