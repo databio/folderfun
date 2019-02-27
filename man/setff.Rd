@@ -10,7 +10,7 @@ setff(name, path = NULL, pathVar = NULL, postpend = NULL)
 \item{name}{An immutable key given to identify the current folder, and used as a
 string to create the new folder function}
 
-\item{path}{An absolute path to a folder that will be prepend when the
+\item{path}{An absolute path to a folder that will be prepended when the
 specified folder function is called}
 
 \item{pathVar}{Name of the currently set variable whose value should 

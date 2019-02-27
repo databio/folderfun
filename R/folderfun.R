@@ -32,7 +32,7 @@ NULL
 #' 
 #' @param name An immutable key given to identify the current folder, and used as a
 #'     string to create the new folder function
-#' @param path An absolute path to a folder that will be prepend when the
+#' @param path An absolute path to a folder that will be prepended when the
 #'     specified folder function is called
 #' @param pathVar Name of the currently set variable whose value should 
 #'    be bound to \code{name}. First \code{getOption} is used, and then 
