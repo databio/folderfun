@@ -72,7 +72,7 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
     options(l)
     funcName = paste0(.FFTAGFUNC, name)
     tempFunc = function(...) {
-      userPath = .sanitizeUserPath(...)
+      #' userPath = .sanitizeUserPath(...)
       userPath = file.path(...)
       # First check if there's an R option with this name.
       parentFolder = getOption(varName)
@@ -119,6 +119,9 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
 file.path = function(...) {
     sep = .Platform$file.sep
     l = list(...)
+    if (length(l) < 1) {
+      return("")
+    }
     checkForBads = sapply(list(...), identical, character(0))
     if (length(checkForBads) > 0) {
       l[checkForBads] = ""
