@@ -72,7 +72,6 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
     options(l)
     funcName = paste0(.FFTAGFUNC, name)
     tempFunc = function(...) {
-      #' userPath = .sanitizeUserPath(...)
       userPath = file.path(...)
       # First check if there's an R option with this name.
       parentFolder = getOption(varName)
@@ -101,7 +100,6 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
     if (.nonempty(res)) return(res)
   }
 }
-
 
 # paste0() if given no values returns character(0); this doesn't play
 # nicely with file.path, which returns bad value if any of the values are
