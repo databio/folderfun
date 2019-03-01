@@ -131,6 +131,9 @@ test_that("Option lookup is case insensitive", {
 })
 
 test_that("Environment variable lookup is case insensitive", {
+	# Windows and MACOS have case-insensitive file systems.
+	skip_on_os("windows")
+	skip_on_os("mac")	
 	minLen = 10
 	maxLen = 20
 	var = getRandVarName(minLen=minLen, maxLen=maxLen)
@@ -157,6 +160,9 @@ test_that("Environment variable lookup is case insensitive", {
 })
 
 test_that("Exact name lookup precedes case variation", {
+	# Windows and MACOS have case-insensitive file systems.
+	skip_on_os("windows")
+	skip_on_os("mac")
 	exactVal = "exact"
 	upperVal = "upper"
 	lowerVal = "lower"
@@ -205,3 +211,18 @@ test_that("Exact name lookup precedes case variation", {
 		}
 	}
 })
+
+
+test_that("Bad user input is ignored", {
+	sep = .Platform$file.sep
+	setff("Code", tempdir())
+	expect_equal(ffCode(), tempdir())
+	expect_equal(ffCode("dir"), paste(tempdir(), "dir", sep=sep))
+	expect_equal(ffCode("dir", "dir2"), paste(tempdir(), "dir", "dir2", sep=sep))
+	expect_equal(ffCode("dir", sep, "dir2", sep, sep, "dir3"),
+		paste(tempdir(), "dir", "dir2", "dir3", sep=sep))
+	expect_equal(ffCode("dir", "dir2", "dir3", character(0)),
+		file.path(tempdir(), "dir", "dir2", "dir3", ""))
+
+})
+

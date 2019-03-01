@@ -4,13 +4,14 @@
 \alias{setff}
 \title{Creator of function to reference project path.}
 \usage{
-setff(name, path = NULL, pathVar = NULL, postpend = NULL)
+setff(name, path = NULL, pathVar = NULL, postpend = NULL,
+  loadEnvir = globalenv())
 }
 \arguments{
 \item{name}{An immutable key given to identify the current folder, and used as a
 string to create the new folder function}
 
-\item{path}{An absolute path to a folder that will be prepend when the
+\item{path}{An absolute path to a folder that will be prepended when the
 specified folder function is called}
 
 \item{pathVar}{Name of the currently set variable whose value should 
@@ -19,6 +20,11 @@ be bound to \code{name}. First \code{getOption} is used, and then
 
 \item{postpend}{Value(s) with which to make subpath relative to main \code{path} 
 or value fetched from option or environment variable.}
+
+\item{loadEnvir}{An environment. Into which environment would you like to
+load the function? Defaults to \code{\link[base]{globalenv}}. You can
+replace this with  \code{\link[base]{parent.frame}} to restrict the scope
+of created functions.}
 }
 \value{
 A function named \code{ff<name>} that when executed without 
