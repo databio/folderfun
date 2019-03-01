@@ -32,13 +32,17 @@ NULL
 #' 
 #' @param name An immutable key given to identify the current folder, and used as a
 #'     string to create the new folder function
-#' @param path An absolute path to a folder that will be prepend when the
+#' @param path An absolute path to a folder that will be prepended when the
 #'     specified folder function is called
 #' @param pathVar Name of the currently set variable whose value should 
 #'    be bound to \code{name}. First \code{getOption} is used, and then 
 #'    \code{Sys.getenv}.
 #' @param postpend Value(s) with which to make subpath relative to main \code{path} 
 #'    or value fetched from option or environment variable.
+#' @param loadEnvir    An environment. Into which environment would you like to
+#'     load the function? Defaults to \code{\link[base]{globalenv}}. You can
+#'     replace this with  \code{\link[base]{parent.frame}} to restrict the scope
+#'     of created functions.
 #' @return A function named \code{ff<name>} that when executed without 
 #'    arguments points to the \code{path} and appends the provided argument to it
 #'    if any were provided.
@@ -47,36 +51,41 @@ NULL
 #'  detailed explanation of the concept
 #' @examples
 #' setff("PROC", "/path/to/directory")
-setff = function(name, path = NULL, pathVar = NULL, postpend = NULL) {
-	if (.isEmpty(path)) {
+setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
+    loadEnvir=globalenv()) {
+    if (.isEmpty(path)) {
     path = if (.isEmpty(pathVar)) .lookup(name) else optOrEnvVar(pathVar)
     if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
   } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
   if (.nonempty(postpend)) {
     if (is.character(postpend)) { postpend = list(postpend) }
-    if (is.list(postpend)) { path = file.path(path, do.call(file.path, postpend)) }
+    if (is.list(postpend)) {
+        path = file.path(path, do.call(file.path, postpend))
+    }
     else { stop(sprintf("Invalid argument to postpend: %s (%s)", postpend, class(postpend))) }
   }
-	l = list(path)
-	varName = paste0(.FFTAGOPT, name)
-	names(l) = varName
-	# Set the option
-	options(l)
-	funcName = paste0(.FFTAGFUNC, name)
-	tempFunc = function(...) {
-	  userPath = .sanitizeUserPath(...)
-	  # First check if there's an R option with this name.
-	  parentFolder = getOption(varName)
-	  if (is.null(parentFolder)) {
-	    stop("No parent folder found for variable ", name)
-	  }
-	  outputPath = if (.isEmpty(userPath)) parentFolder else file.path(parentFolder, userPath)
-	  # prevent returing paths with double slashes
-	  outputPath = gsub("//","/",outputPath)
-	  return(outputPath)	
-	}
-	assign(funcName, tempFunc, envir=globalenv())
-	message("Created folder function ", funcName, "(): ", tempFunc())
+    # prevent returning paths with double slashes
+    l = list(gsub("//","/", path))
+    varName = paste0(.FFTAGOPT, name)
+    names(l) = varName
+    # Set the option
+    options(l)
+    funcName = paste0(.FFTAGFUNC, name)
+    tempFunc = function(..., create=FALSE) {
+      userPath = file.path(...)
+      # First check if there's an R option with this name.
+      parentFolder = getOption(varName)
+      if (is.null(parentFolder)) {
+        stop("No parent folder found for variable ", name)
+      }
+      outputPath = if (.isEmpty(userPath)) parentFolder else file.path(parentFolder, userPath)
+      if (create) {
+        dir.create(outputPath, showWarnings=TRUE, recursive=TRUE)
+      }
+      return(outputPath)    
+    }
+    assign(funcName, tempFunc, envir=loadEnvir)
+    message("Created folder function ", funcName, "(): ", tempFunc())
   invisible(tempFunc)
 }
 
@@ -94,7 +103,6 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL) {
   }
 }
 
-
 # paste0() if given no values returns character(0); this doesn't play
 # nicely with file.path, which returns bad value if any of the values are
 # bad, instead of ignoring them. This function changes the default output to an
@@ -106,4 +114,19 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL) {
     userPath = ""
   }
   return(userPath)
+}
+
+file.path = function(...) {
+    sep = .Platform$file.sep
+    l = list(...)
+    if (length(l) < 1) {
+      return("")
+    }
+    checkForBads = sapply(list(...), identical, character(0))
+    if (length(checkForBads) > 0) {
+      l[checkForBads] = ""
+    }
+    fp = do.call(base::file.path, l)
+    result = gsub(paste0(sep,"{2,}"), sep, fp, fixed=FALSE, perl=TRUE)
+    return(result)
 }
