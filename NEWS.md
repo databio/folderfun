@@ -1,7 +1,7 @@
 
 # folderfun [0.1.1] -- 2019-02-28
 
-Fixed a few issues with double-slashes that could get added or reported.
+* Fixed a few issues with double-slashes that could get added or reported.
 
 # folderfun [0.1] -- 2019-02-27
 
