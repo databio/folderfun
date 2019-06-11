@@ -42,3 +42,9 @@ validateFfCleanup = function(var) {
   funcName = paste0(.FFTAGFUNC, var)
   if (exists(funcName)) stop("Failed to remove function: ", funcName)
 }
+
+# Create a temporary directory and sanitize it right away 
+# (get rid of double slashes which come from tempdir() on macOS)
+createTempdir = function() {
+  gsub("//","/", tempdir())
+}

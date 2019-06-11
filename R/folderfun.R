@@ -71,7 +71,7 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
     # Set the option
     options(l)
     funcName = paste0(.FFTAGFUNC, name)
-    tempFunc = function(...) {
+    tempFunc = function(..., create=FALSE) {
       userPath = file.path(...)
       # First check if there's an R option with this name.
       parentFolder = getOption(varName)
@@ -79,7 +79,9 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
         stop("No parent folder found for variable ", name)
       }
       outputPath = if (.isEmpty(userPath)) parentFolder else file.path(parentFolder, userPath)
-
+      if (create) {
+        dir.create(outputPath, showWarnings=TRUE, recursive=TRUE)
+      }
       return(outputPath)    
     }
     assign(funcName, tempFunc, envir=loadEnvir)
