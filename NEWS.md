@@ -1,3 +1,6 @@
+# folderfun [0.1.2] -- 2019-06-11
+
+* Fixed double-slash issues on unit tests for MacOS.
 
 # folderfun [0.1.1] -- 2019-02-28
 
