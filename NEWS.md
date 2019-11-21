@@ -1,3 +1,7 @@
+# folderfun [0.1.3] -- 2019-11-20
+
+* Add `failFunction` option so you can not fail on broken folder functions.
+
 # folderfun [0.1.2] -- 2019-06-11
 
 * Fixed double-slash issues on unit tests for MacOS.

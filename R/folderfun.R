@@ -43,6 +43,9 @@ NULL
 #'     load the function? Defaults to \code{\link[base]{globalenv}}. You can
 #'     replace this with  \code{\link[base]{parent.frame}} to restrict the scope
 #'     of created functions.
+#' @param failFunction   A function to call upon failure. Defaults to
+#'     \code{stop}, but you could instead pass \code{warning} if you are OK with
+#'     failures.
 #' @return A function named \code{ff<name>} that when executed without 
 #'    arguments points to the \code{path} and appends the provided argument to it
 #'    if any were provided.
@@ -52,17 +55,17 @@ NULL
 #' @examples
 #' setff("PROC", "/path/to/directory")
 setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
-    loadEnvir=globalenv()) {
+    loadEnvir=globalenv(), failFunction=stop) {
     if (.isEmpty(path)) {
     path = if (.isEmpty(pathVar)) .lookup(name) else optOrEnvVar(pathVar)
-    if (.isEmpty(path)) stop("Attempted to set empty value for ", name)
+    if (.isEmpty(path)) failFunction("Attempted to set empty value for ", name)
   } else if (!.isEmpty(pathVar)) { warning("Explicit value provided; ignoring ", pathVar) }
   if (.nonempty(postpend)) {
     if (is.character(postpend)) { postpend = list(postpend) }
     if (is.list(postpend)) {
         path = file.path(path, do.call(file.path, postpend))
     }
-    else { stop(sprintf("Invalid argument to postpend: %s (%s)", postpend, class(postpend))) }
+    else { failFunction(sprintf("Invalid argument to postpend: %s (%s)", postpend, class(postpend))) }
   }
     # prevent returning paths with double slashes
     l = list(gsub("//","/", path))
@@ -76,7 +79,7 @@ setff = function(name, path = NULL, pathVar = NULL, postpend = NULL,
       # First check if there's an R option with this name.
       parentFolder = getOption(varName)
       if (is.null(parentFolder)) {
-        stop("No parent folder found for variable ", name)
+        failFunction("No parent folder found for variable ", name)
       }
       outputPath = if (.isEmpty(userPath)) parentFolder else file.path(parentFolder, userPath)
       if (create) {
