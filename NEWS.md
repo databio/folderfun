@@ -1,4 +1,4 @@
-# folderfun [0.1.3] -- 2019-11-20
+# folderfun [0.1.3] -- 2020-07-14
 
 * Add `failFunction` option so you can not fail on broken folder functions.
 
