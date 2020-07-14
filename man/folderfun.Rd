@@ -3,7 +3,6 @@
 \docType{package}
 \name{folderfun}
 \alias{folderfun}
-\alias{folderfun-package}
 \title{Manages folder functions}
 \description{
 If you find yourself working on multiple different projects in R, you'll want

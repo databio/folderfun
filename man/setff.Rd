@@ -4,8 +4,14 @@
 \alias{setff}
 \title{Creator of function to reference project path.}
 \usage{
-setff(name, path = NULL, pathVar = NULL, postpend = NULL,
-  loadEnvir = globalenv())
+setff(
+  name,
+  path = NULL,
+  pathVar = NULL,
+  postpend = NULL,
+  loadEnvir = globalenv(),
+  failFunction = stop
+)
 }
 \arguments{
 \item{name}{An immutable key given to identify the current folder, and used as a
@@ -25,6 +31,10 @@ or value fetched from option or environment variable.}
 load the function? Defaults to \code{\link[base]{globalenv}}. You can
 replace this with  \code{\link[base]{parent.frame}} to restrict the scope
 of created functions.}
+
+\item{failFunction}{A function to call upon failure. Defaults to
+\code{stop}, but you could instead pass \code{warning} if you are OK with
+failures.}
 }
 \value{
 A function named \code{ff<name>} that when executed without 
