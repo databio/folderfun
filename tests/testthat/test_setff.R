@@ -197,7 +197,8 @@ test_that("Exact name lookup precedes case variation", {
 			setVar(upperVar, upperVal)
 			setVar(lowerVar, lowerVal)
 			for (v in allVars) { check(v) }
-			expect_equal(setff(mixedVar)(), exactVal)
+			setVia <- function(nt) { setff(mixedVar)() }
+			expect_equal(setVia(!!nameType), exactVal)
 			for (v in allVars) {
 				clean(v)
 				neitherOptNorEnvVar(v)
