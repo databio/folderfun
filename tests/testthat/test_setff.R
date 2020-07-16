@@ -102,9 +102,7 @@ test_that("name to set can be interpreted as name of current option holding valu
 })
 
 test_that("Option lookup is case insensitive", {
-	minLen = 10
-	maxLen = 20
-	var = getRandVarName(minLen=minLen, maxLen=maxLen)
+	var = getRandVarName()
 	val = "dummy_test_val"
 	typesAlwaysFound = c("tolower", "toupper")
 	caseTypes = c("tomixed", typesAlwaysFound)
@@ -133,9 +131,7 @@ test_that("Environment variable lookup is case insensitive", {
 	# Windows and MACOS have case-insensitive file systems.
 	skip_on_os("windows")
 	skip_on_os("mac")	
-	minLen = 10
-	maxLen = 20
-	var = getRandVarName(minLen=minLen, maxLen=maxLen)
+	var = getRandVarName()
 	val = "dummy_test_val"
 	typesAlwaysFound = c("tolower", "toupper")
 	caseTypes = c("tomixed", typesAlwaysFound)
@@ -165,7 +161,7 @@ test_that("Exact name lookup precedes case variation", {
 	exactVal = "exact"
 	upperVal = "upper"
 	lowerVal = "lower"
-	for (var in sapply(1:5, getRandVarName)) {
+	for (var in sapply(1:5, function(i) { getRandVarName(i, maxLen = 5) })) {
 		mixedVar = tomixed(var)
 		upperVar = toupper(var)
 		lowerVar = tolower(var)
