@@ -161,7 +161,7 @@ test_that("Exact name lookup precedes case variation", {
 	exactVal = "exact"
 	upperVal = "upper"
 	lowerVal = "lower"
-	for (var in sapply(1:5, function(i) { getRandVarName(i, maxLen = 5) })) {
+	for (var in sapply(1:5, function(i) getRandVarName())) {
 		mixedVar = tomixed(var)
 		upperVar = toupper(var)
 		lowerVar = tolower(var)
