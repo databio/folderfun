@@ -29,7 +29,8 @@ tomixed = function(name) {
   if (tolower(name) != name) stop("Not all lowercase: ", name)
   chars = unlist(strsplit(name, ""))
   if (length(chars) < 2) {
-    stop("Mixed-case requires at least 2 character; got ", length(chars))
+    stop(sprintf("Mixed-case requires at least 2 characters; got %s: %s", 
+      length(chars), chars))
   }
   indices = sample(1:length(chars), size = sample(1:(length(chars) - 1), size = 1))
   mixed = sapply(1:length(chars), 
