@@ -1,7 +1,6 @@
 # helper-all.R
 # Ancillary functions for setff tests
 # Author: Vince Reuter
-# Email: vpr9v@virginia.edu
 
 # Remove (set as NULL) the option this package uses to store a named variable,
 # and remove the variable storing its fetcher function.

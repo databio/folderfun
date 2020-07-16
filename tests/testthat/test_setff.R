@@ -1,7 +1,6 @@
 # test_setff.R
 # Tests of binding value to name.
 # Author: Vince Reuter
-# Email: vpr9v@virginia.edu
 
 context("setff")
 
