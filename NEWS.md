@@ -1,3 +1,8 @@
+# folderfun [0.1.4] -- Unreleased
+
+* Fix stochastic errors in test suite.
+* Improve test suite error messages.
+
 # folderfun [0.1.3] -- 2020-07-14
 
 * Add `failFunction` option so you can not fail on broken folder functions.
