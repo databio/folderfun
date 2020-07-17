@@ -1,4 +1,4 @@
-# `folderfun`: Manage disks with R folder functions 
+# `folderfun`: Manage paths with R folder functions 
 [![Build Status](https://travis-ci.org/databio/folderfun.svg?branch=master)](https://travis-ci.org/databio/folderfun)
 
 If you find yourself working on multiple different projects in R, you'll want to sort your input data and output results into folders containing raw data, processed data, plot results, intermediate table outputs, etc. This package makes it easier to do that by providing a quick and easy way to create and use functions for any directories, so you don't have to deal with annoying hard-coded absolute paths.
