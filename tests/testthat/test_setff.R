@@ -1,7 +1,6 @@
 # test_setff.R
 # Tests of binding value to name.
 # Author: Vince Reuter
-# Email: vpr9v@virginia.edu
 
 context("setff")
 
@@ -103,9 +102,7 @@ test_that("name to set can be interpreted as name of current option holding valu
 })
 
 test_that("Option lookup is case insensitive", {
-	minLen = 10
-	maxLen = 20
-	var = getRandVarName(minLen=minLen, maxLen=maxLen)
+	var = getRandVarName()
 	val = "dummy_test_val"
 	typesAlwaysFound = c("tolower", "toupper")
 	caseTypes = c("tomixed", typesAlwaysFound)
@@ -134,9 +131,7 @@ test_that("Environment variable lookup is case insensitive", {
 	# Windows and MACOS have case-insensitive file systems.
 	skip_on_os("windows")
 	skip_on_os("mac")	
-	minLen = 10
-	maxLen = 20
-	var = getRandVarName(minLen=minLen, maxLen=maxLen)
+	var = getRandVarName()
 	val = "dummy_test_val"
 	typesAlwaysFound = c("tolower", "toupper")
 	caseTypes = c("tomixed", typesAlwaysFound)
@@ -166,7 +161,7 @@ test_that("Exact name lookup precedes case variation", {
 	exactVal = "exact"
 	upperVal = "upper"
 	lowerVal = "lower"
-	for (var in sapply(1:5, getRandVarName)) {
+	for (var in sapply(1:5, function(i) getRandVarName())) {
 		mixedVar = tomixed(var)
 		upperVar = toupper(var)
 		lowerVar = tolower(var)
@@ -202,7 +197,8 @@ test_that("Exact name lookup precedes case variation", {
 			setVar(upperVar, upperVal)
 			setVar(lowerVar, lowerVal)
 			for (v in allVars) { check(v) }
-			expect_equal(setff(mixedVar)(), exactVal)
+			setVia <- function(nt) { setff(mixedVar)() }
+			expect_equal(setVia(!!nameType), exactVal)
 			for (v in allVars) {
 				clean(v)
 				neitherOptNorEnvVar(v)

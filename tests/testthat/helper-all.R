@@ -1,7 +1,6 @@
 # helper-all.R
 # Ancillary functions for setff tests
 # Author: Vince Reuter
-# Email: vpr9v@virginia.edu
 
 # Remove (set as NULL) the option this package uses to store a named variable,
 # and remove the variable storing its fetcher function.
@@ -19,7 +18,7 @@ getRandVarName = function(minLen = 10, maxLen = 20) {
     minLen, maxLen))
   if (maxLen < minLen) stop(sprintf(
     "Max chars < min chars for random string: %d < %d", maxLen, minLen))
-  paste0(sample(letters, sample(minLen:maxLen)), collapse = "")
+  paste0(sample(letters, size = sample(minLen:maxLen, size = 1)), collapse = "")
 }
 
 neitherOptNorEnvVar = function(n) { stopifnot(
@@ -28,8 +27,12 @@ neitherOptNorEnvVar = function(n) { stopifnot(
 # Randomly select a subset of a name's characters to convert to uppercase
 tomixed = function(name) {
   if (tolower(name) != name) stop("Not all lowercase: ", name)
-  chars = unlist(strsplit(name, ""))    
-  indices = sample(1:length(chars), sample(1:(length(chars) - 1)))
+  chars = unlist(strsplit(name, ""))
+  if (length(chars) < 2) {
+    stop(sprintf("Mixed-case requires at least 2 characters; got %s: %s", 
+      length(chars), chars))
+  }
+  indices = sample(1:length(chars), size = sample(1:(length(chars) - 1), size = 1))
   mixed = sapply(1:length(chars), 
     function(i) ifelse(i %in% indices, toupper(chars[i]), chars[i]))
   paste0(mixed, collapse="")
